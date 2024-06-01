@@ -1,0 +1,20 @@
+{
+  "name": "com.ez337.ezconditions",
+  "version": "1.0.0-beta.1",
+  "displayName": "EZ Conditions",
+  "description": "This package creates a system to enable designers and developers to create \neditor-friendly conditions on Unity Objects that can be evaluated at run time.\n\nusing EZ_Conditions namespace\nAdd a \"ConditionManager\" Component to an object and add a [Condition] Attribute to a method/property to get started.\nConditions are evaluated with OR Superiorty such that AB+CD+E results in A*(B+C)*(D+E)",
+  "unity": "2019.2",
+  "documentationUrl": "https://example.com/",
+  "changelogUrl": "https://example.com/changelog.html",
+  "licensesUrl": "https://example.com/licensing.html",
+  "keywords": [
+    "condition",
+    "editor",
+    "editor tools",
+    "tools",
+    "developer tools"
+  ],
+  "author": {
+    "name": "EZ337"
+  }
+}
