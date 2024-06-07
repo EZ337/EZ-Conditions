@@ -1,0 +1,16 @@
+{
+    "name": "ezconditions.sample",
+    "rootNamespace": "",
+    "references": [
+        "ez337.ezconditions"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
