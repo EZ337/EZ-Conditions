@@ -21,6 +21,11 @@ namespace EZConditions
         [SerializeField]
         private float maxWeight = 100;
 
+        public Condition2EnumTest enumTest;
+
+        public Condition2EnumTest2 enumTest2;
+
+
         [Condition(typeof(float))]
         public float GetInventoryRatio()
         {
@@ -41,6 +46,37 @@ namespace EZConditions
         public bool InDialogue()
         {
             return inDialogue;
+        }
+
+        [Condition(typeof(Condition2EnumTest))]
+        public Condition2EnumTest GetEnum1()
+        {
+            return enumTest;
+        }
+
+        [Condition(typeof(Condition2EnumTest2))]
+        public Condition2EnumTest2 GetEnum2()
+        {
+            return enumTest2;
+        }
+
+
+        public enum Condition2EnumTest
+        {
+            Choice1,
+            Choice2,
+            Choice3,
+            Choice4,
+            Choice5
+        }
+
+        public enum Condition2EnumTest2
+        {
+            ChoiceA,
+            ChoiceB,
+            ChoiceC,
+            ChoiceD,
+            ChoiceE,
         }
     }
 

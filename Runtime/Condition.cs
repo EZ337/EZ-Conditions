@@ -63,21 +63,35 @@ namespace EZConditions
         {
             get
             {
-                // Reconstruct param2 from its serialized form
-                if (param2 == null && !string.IsNullOrEmpty(param2Type))
+                try
                 {
-                    var type = Type.GetType(param2Type);
-                    if (type != null)
+                    // Reconstruct param2 from its serialized form
+                    if (param2 == null && !string.IsNullOrEmpty(param2Type))
                     {
-                        if (typeof(UnityEngine.Object).IsAssignableFrom(type))
+                        var type = Type.GetType(param2Type);
+
+                        if (type != null)
                         {
-                            param2 = param2AsUnityObject;
-                        }
-                        else
-                        {
-                            param2 = Convert.ChangeType(param2Value, type);
+                            if (typeof(UnityEngine.Object).IsAssignableFrom(type))
+                            {
+                                param2 = param2AsUnityObject;
+                            }
+                            else if (type.IsEnum)
+                            {
+                                param2 = Enum.Parse(type, param2Value);
+                            }
+                            else
+                            {
+                                param2 = Convert.ChangeType(param2Value, type);
+                            }
                         }
                     }
+                }
+
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"EZConditions: Crashed getting param2. Param2Type: {param2Type}; Value: {param2Value}. Let EZ Know");
+                    Debug.LogError(e);
                 }
 
                 return param2;

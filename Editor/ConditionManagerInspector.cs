@@ -21,6 +21,7 @@ namespace EZConditions
         public VisualTreeAsset VisualTree;
         public DropdownField conditionField;
         public EnumField comparatorField;
+        public EnumField enumCompare;
         public ObjectField param1Field;
         public IntegerField intCompare;
         public FloatField floatCompare;
@@ -61,6 +62,7 @@ namespace EZConditions
             param1Field = root.Q<ObjectField>("param1");
             conditionField = root.Q<DropdownField>("cond-func");
             comparatorField = root.Q<EnumField>("comparator");
+            enumCompare = root.Q<EnumField>("enum-compare");
             intCompare = root.Q<IntegerField>("int-compare");
             floatCompare = root.Q<FloatField>("float-compare");
             stringCompare = root.Q<TextField>("string-compare");
@@ -215,6 +217,14 @@ namespace EZConditions
                     ShowElement(boolCompare);
                     selectedArgument = boolCompare;
                 }
+                else if (attrType.IsEnum)
+                {
+                    ShowElement(enumCompare);
+                    selectedArgument = enumCompare;
+                    // Get the type of the enum
+                    System.Enum enumType = (System.Enum) attrType.GetEnumValues().GetValue(0);
+                    enumCompare.Init(enumType);
+                }
                 else
                 {
                     ShowElement(param2Field);
@@ -348,6 +358,8 @@ namespace EZConditions
                 return objectField.value;
             else if (elm is Toggle toggle)
                 return toggle.value;
+            else if (elm is EnumField enumField)
+                return enumField.value; 
 
             return null;
         }
@@ -374,6 +386,7 @@ namespace EZConditions
             compareBtn.style.display = DisplayStyle.Flex;
             createConditionBtn.style.display = DisplayStyle.Flex;
             ORField.style.display = DisplayStyle.Flex;
+            enumCompare.style.display = DisplayStyle.Flex;
         }
 
         private void HideAllOptions()
@@ -390,6 +403,7 @@ namespace EZConditions
             //compareBtn.style.display = DisplayStyle.None;
             createConditionBtn.style.display = DisplayStyle.None;
             ORField.style.display = DisplayStyle.None;
+            enumCompare.style.display = DisplayStyle.None;
         }
 
         #endregion

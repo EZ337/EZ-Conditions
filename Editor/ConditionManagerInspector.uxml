@@ -13,6 +13,7 @@
                 <ui:IntegerField value="0" name="int-compare" label="Integer" />
                 <ui:FloatField label="Float" value="0" name="float-compare" />
                 <ui:TextField picking-mode="Ignore" label="Text" name="string-compare" />
+                <ui:EnumField label="Enum" type="EZConditions.Condition2+Condition2EnumTest, ezconditions.sample" name="enum-compare" />
                 <ui:Toggle label="Bool" name="bool-compare" />
                 <uie:ObjectField label="Param 2" name="param2" />
                 <ui:Toggle label="OR" name="OR" tooltip="Check this button if you want the condition to be an OR condition. Otherwise, it&apos;s an AND condition" />

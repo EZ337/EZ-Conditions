@@ -136,6 +136,7 @@ GameObject:
   - component: {fileID: 142423399}
   - component: {fileID: 142423403}
   - component: {fileID: 142423404}
+  - component: {fileID: 142423405}
   m_Layer: 0
   m_Name: Character
   m_TagString: Untagged
@@ -263,6 +264,39 @@ MonoBehaviour:
   timesDefeated: 110
   inventoryWeight: 337
   maxWeight: 100
+  enumTest: 1
+  enumTest2: 0
+--- !u!114 &142423405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 142423398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0080e6fec2a51344b8d8e64cb0f93a47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Conditions:
+  - obj: {fileID: 142423404}
+    comparator: 2
+    or: 1
+    methodName: GetEnum2
+    param2Type: EZConditions.Condition2+Condition2EnumTest2, ezconditions.sample,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    param2Value: ChoiceD
+    param2AsUnityObject: {fileID: 0}
+    param2Evaluation: 0
+  - obj: {fileID: 142423404}
+    comparator: 2
+    or: 0
+    methodName: GetEnum1
+    param2Type: EZConditions.Condition2+Condition2EnumTest, ezconditions.sample,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    param2Value: Choice1
+    param2AsUnityObject: {fileID: 0}
+    param2Evaluation: 0
 --- !u!1 &189146399
 GameObject:
   m_ObjectHideFlags: 0
