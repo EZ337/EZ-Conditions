@@ -25,6 +25,43 @@ namespace EZConditions
 
         public Condition2EnumTest2 enumTest2;
 
+        public ConditionManagerComponent conditionManager;
+
+        private void Update()
+        {
+            if (inDialogue && Input.GetKeyDown(KeyCode.Space))
+            {
+                Debug.Log("Running conditions for dialogue.");
+
+                if (conditionManager.EvaluateConditions())
+                {
+                    Debug.Log("Conditions ran successfully");
+                    Debug.Log($"Hello. Name's {name}. It looks like the conditions passed to allow me to say this line");
+                }
+                else
+                {
+                    Debug.Log("Conditions failed");
+                    Debug.Log($"Hello, there seems to be a failure. I don't know what to say");
+                }
+
+            }
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            Debug.Log("Player left dialogue");
+            inDialogue = false;
+        }
+
+        private void OnTriggerStay(Collider other)
+        {
+            if (other.CompareTag("Player"))
+            {
+                Debug.Log("Player entered. Press Space to start dialogue dialogue");
+                inDialogue = true;
+            }
+        }
+
 
         [Condition(typeof(float))]
         public float GetInventoryRatio()

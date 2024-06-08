@@ -14,8 +14,8 @@ using Debug = UnityEngine.Debug;
 
 namespace EZConditions
 {
-    [CustomEditor(typeof(ConditionManager))]
-    public class ConditionManagerInspector : Editor
+    [CustomEditor(typeof(ConditionManagerComponent))]
+    public class ConditionManagerComponentInspector : Editor
     {
 
         public VisualTreeAsset VisualTree;
@@ -311,7 +311,7 @@ namespace EZConditions
 
             //Debug.Log("Created Condition: " + condition);
             // Add the new Condition to the list
-            if (target is ConditionManager conditionManager)
+            if (target is ConditionManagerComponent conditionManager)
             {
                 conditionManager.Conditions.Add(condition);
                 EditorUtility.SetDirty(target);
@@ -339,7 +339,7 @@ namespace EZConditions
             }
             */
 
-            if (target is ConditionManager conditionManager)
+            if (target is ConditionManagerComponent conditionManager)
             {
                 conditionManager.EvaluateConditions(true);
             }

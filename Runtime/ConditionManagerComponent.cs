@@ -5,7 +5,7 @@ using EZConditions;
 
 namespace EZConditions
 {
-    public class ConditionManager : MonoBehaviour
+    public class ConditionManagerComponent : MonoBehaviour
     {
         /// <summary>
         /// List of conditions
