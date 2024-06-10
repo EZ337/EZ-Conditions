@@ -47,7 +47,7 @@ namespace EZConditions
                 }
                 if (function == null)
                 {
-                    Debug.LogError("Critical Error. Was unable to fetch condition function. Let EZ Know");
+                    Debug.LogError("Critical Error. Was unable to fetch condition function.\nCreating Conditions with the \"+\" button is unsupported. If that's not your issue, Let EZ Know");
                 }
 
                 return function;

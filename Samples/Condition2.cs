@@ -25,7 +25,7 @@ namespace EZConditions
 
         public Condition2EnumTest2 enumTest2;
 
-        public ConditionManagerComponent conditionManager;
+        public ConditionManager conditionManager;
 
         private void Update()
         {
