@@ -267,15 +267,7 @@ MonoBehaviour:
   enumTest: 1
   enumTest2: 0
   conditionManager:
-    Conditions:
-    - obj: {fileID: 0}
-      comparator: 0
-      or: 0
-      methodName: 
-      param2Type: 
-      param2Value: 
-      param2AsUnityObject: {fileID: 0}
-      param2Evaluation: 0
+    Conditions: []
 --- !u!114 &142423405
 MonoBehaviour:
   m_ObjectHideFlags: 0
