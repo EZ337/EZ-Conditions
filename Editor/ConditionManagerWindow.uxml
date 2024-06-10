@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <ui:VisualElement style="flex-grow: 1;">
-        <ui:ListView name="conditions-list" show-foldout-header="true" header-title="Conditions" show-add-remove-footer="true" />
+        <ui:ListView name="conditions-list" show-foldout-header="true" header-title="Conditions" show-add-remove-footer="false" show-border="false" show-bound-collection-size="false" reorderable="true" />
         <ui:VisualElement name="divider" style="flex-grow: 1; margin-top: 10px; margin-bottom: 5px; background-color: rgb(71, 71, 71); max-height: 2px;" />
         <ui:Button text="Test Conditions" parse-escape-sequences="true" display-tooltip-when-elided="true" name="evaluateCondition" />
         <ui:Foldout text="Create New Condition" name="create-cond-foldout" tooltip="Create or Test a condition" view-data-key="create-condition-data-key" style="padding-left: 12px;">

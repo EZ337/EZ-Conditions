@@ -37,7 +37,7 @@ public class ConditionManagerWindow : EditorWindow
     {
         ConditionManager = conditionmanager;
         ConditionManagerWindow wnd = GetWindow<ConditionManagerWindow>();
-        wnd.titleContent = new GUIContent("Condition Manager");
+        wnd.titleContent = new GUIContent($"{ConditionManager.serializedObject.targetObject} - Condition Manager");
     }
 
     private void OnDisable()
@@ -56,17 +56,23 @@ public class ConditionManagerWindow : EditorWindow
         // Import UXML
         if (visualTree == null)
         {
-            visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Scripts/Editor/Dialogue System/DialogueEditorWindow.uxml");
+            visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.ez337.ezconditions/Editor/ConditionManagerWindow.uxml");
         }
         visualTree.CloneTree(root);
 
         ListView conditionsList = root.Q<ListView>("conditions-list");
 
+        // Hide the window if we had the screen up for 
         if (ConditionManager != null)
         {
-            Debug.Log("We have a condition Manager: " + ConditionManager.boxedValue);
+            //Debug.Log("We have a condition Manager: " + ConditionManager.boxedValue);
             conditionsList.Clear();
             conditionsList.BindProperty(ConditionManager.FindPropertyRelative("Conditions"));
+        }
+        else
+        {
+            Debug.Log("No Valid ConditionManager");
+            this.Close();
         }
 
         param1Field = root.Q<ObjectField>("param1");
@@ -102,9 +108,9 @@ public class ConditionManagerWindow : EditorWindow
     /// <param name="component">The object we are querying</param>
     private void PopulateConditions(UnityEngine.Object component)
     {
-        // Get all methods and properties with ConditionAttribute
+        // Get only public methods and properties with ConditionAttribute
         List<MemberInfo> members = component.GetType()
-            .GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .GetMembers(BindingFlags.Instance | BindingFlags.Public)
             .Where(member => (member is MethodInfo || member is PropertyInfo) &&
                              member.GetCustomAttribute<ConditionAttribute>() != null)
             .ToList();
@@ -243,7 +249,7 @@ public class ConditionManagerWindow : EditorWindow
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning($"Unable to properly accept type {attrType}. Let EZ Know");
+                    Debug.LogWarning($"Unable to properly accept type {attrType}. Verify or Let EZ Know");
                     Debug.LogError(ex);
                 }
                 selectedArgument = param2Field;

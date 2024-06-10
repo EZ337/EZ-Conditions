@@ -267,7 +267,31 @@ MonoBehaviour:
   enumTest: 1
   enumTest2: 0
   conditionManager:
-    Conditions: []
+    Conditions:
+    - obj: {fileID: 142423403}
+      comparator: 0
+      or: 0
+      methodName: VoidFunction
+      param2Type: 
+      param2Value: 
+      param2AsUnityObject: {fileID: 0}
+      param2Evaluation: 0
+    - obj: {fileID: 189146401}
+      comparator: 0
+      or: 0
+      methodName: get_Name
+      param2Type: System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+      param2Value: steve
+      param2AsUnityObject: {fileID: 0}
+      param2Evaluation: 0
+    - obj: {fileID: 189146401}
+      comparator: 0
+      or: 1
+      methodName: HasCollider
+      param2Type: 
+      param2Value: 
+      param2AsUnityObject: {fileID: 0}
+      param2Evaluation: 1
 --- !u!114 &142423405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -377,10 +401,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fade6a22e29d53247a3f98eeff66a025, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Name>k__BackingField: 
+  <Name>k__BackingField: steve
   isDead: 1
   DeathXP: 50
-  Collider: {fileID: 0}
+  Collider: {fileID: 189146402}
 --- !u!65 &189146402
 BoxCollider:
   m_ObjectHideFlags: 0

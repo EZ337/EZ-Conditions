@@ -22,17 +22,17 @@ namespace EZConditions
             if (property.isExpanded)
             {
                 float newPos = EditorGUI.GetPropertyHeight(property, true);
-                Rect testBtn = new Rect(position.x, position.y + newPos, position.width, EditorGUIUtility.singleLineHeight);
+                Rect testBtn = new Rect(position.x + position.width/3, position.y + newPos, position.width / 3, EditorGUIUtility.singleLineHeight);
                 Rect createBtn = testBtn; createBtn.y += EditorGUIUtility.singleLineHeight;
 
-                if (GUI.Button(testBtn, "ClickMe"))
+                if (GUI.Button(testBtn, "Test Conditions"))
                 {
-                    Debug.Log("Clicked Me");
+                    ((ConditionManager)property.boxedValue).EvaluateConditions(true);
                 }
 
                 if (GUI.Button(createBtn, "Create Condition"))
                 {
-                    Debug.Log("Clicked Create");
+                    ConditionManagerWindow.ShowWindow(property);
                 }
 
             }

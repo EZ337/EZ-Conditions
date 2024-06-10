@@ -29,6 +29,10 @@ namespace EZConditions
             Debug.Log($"{Name} called VoidFunction");
         }
 
+        /// <summary>
+        /// Function will not show up because it is private
+        /// </summary>
+        /// <returns></returns>
         [Condition(typeof(int))]
         private int HiddenConditionFunction()
         {

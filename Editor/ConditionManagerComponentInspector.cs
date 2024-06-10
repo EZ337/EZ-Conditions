@@ -94,9 +94,9 @@ namespace EZConditions
         /// <param name="component">The object we are querying</param>
         private void PopulateConditions(UnityEngine.Object component)
         {
-            // Get all methods and properties with ConditionAttribute
+            // Get only public methods and properties with ConditionAttribute
             List<MemberInfo> members = component.GetType()
-                .GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .GetMembers(BindingFlags.Instance | BindingFlags.Public)
                 .Where(member => (member is MethodInfo || member is PropertyInfo) &&
                                  member.GetCustomAttribute<ConditionAttribute>() != null)
                 .ToList();
