@@ -39,6 +39,7 @@ namespace EZConditions
             // Creates and caches function if its null.
             get
             {
+                // Try catch will be nice
                 if (function == null)
                 {
                     if (MethodName == null)
@@ -179,75 +180,93 @@ namespace EZConditions
         /// <returns>A valid comparison of true or false. False if unable to compare the two objects</returns>
         public bool Evaluate(System.Object obj, MethodInfo function, ConditionComparator comparator, System.Object param2)
         {
-            // All functions should not take args
-            System.Object[] argsList = new System.Object[0];
-            System.Object ret = function.Invoke(obj, argsList); // Call the function
-
-            // Can we compare the two objects against each other? (It's a loose definition here)
-            if (ret is IComparable comparableRet && param2 is IComparable comparableParam2)
+            try
             {
-                try
+                // All functions should not take args
+                System.Object[] argsList = new System.Object[0];
+                System.Object ret = function.Invoke(obj, argsList); // Call the function
+
+                // Can we compare the two objects against each other? (It's a loose definition here)
+                if (ret is IComparable comparableRet && param2 is IComparable comparableParam2)
                 {
                     return Compare(comparableRet.CompareTo(comparableParam2), comparator);
                 }
-                catch (Exception ex)
-                {
-                    Debug.LogWarning($"Condition - {function}: Cannot compare these two types with each other. Error is handled though. Let EZ know");
-                    Debug.LogError($"Condition Function Returning false.\n" + ex);
-                    return false;
-                }
+
+                Debug.LogWarning($"{this}: Cannot compare {obj} and {(param2 ?? "Null")}.");
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"{this} Evaluation crashed. This is a noteworthy issue. Please debug and share info with EZ.");
+                Debug.LogException(e);
+                // We crash if this is build. Otherwise, we return false in editor mode
+#if !UNITY_EDITOR
+                    throw;
+#endif
             }
 
-
-            Debug.LogWarning($"Condition - {function}: Param1 and Param2 cannot be compared to each other. False");
             return false;
         }
 
 
         public bool EvaluateParam2(System.Object obj, MethodInfo function, ConditionComparator comparator, System.Object param2)
         {
-            // Function should take param2. Need to expand this later probably
-            System.Object[] argsList = new System.Object[1] { param2 };
-            System.Object ret = function.Invoke(obj, argsList); // Call the function
-
-            if (ret is bool bRet)
+            try
             {
-                // Just returns the result from the function. This means all the work is left to
-                // the function itself. May need revisitation to uncomment below but for now, the work is done
-                // by the function.
-                return bRet;
+                // Function should take param2. Need to expand this later probably
+                System.Object[] argsList = new System.Object[1] { param2 };
+                System.Object ret = function.Invoke(obj, argsList); // Call the function
 
-                /*
-                // returnedValue = 0 if true. 1 if false.
-                int retVal = (bRet) ? 0 : 1;
-
-                if (comparator == ConditionComparator.Equal)
+                if (ret is bool bRet)
                 {
-                    // True means 0, false is otherwise... ik. Backwards
-                    // In casee I forget why: Remember in architecture, True means (A - B) = 0. Meaning they are the same
-                    // Compare() is a true boolean evaluation. So If checking equal, you want to check that there is no difference i.e.
-                    // result is 0.
+                    // Just returns the result from the function. This means all the work is left to
+                    // the function itself. May need revisitation to uncomment below but for now, the work is done
+                    // by the function.
+                    return bRet;
 
-                    return Compare(retVal, comparator);
-                }
-                else if (comparator == ConditionComparator.NotEqual)
-                {
-                    // Because we are checking NotEqual, that means we are checking that there IS a difference. In other words,
-                    // returnedValue should NOT be 0.
+                    /*
+                    // returnedValue = 0 if true. 1 if false.
+                    int retVal = (bRet) ? 0 : 1;
 
-                    return Compare(retVal, comparator);
-                }
-                else
-                {
-                    Debug.LogWarning($"Only choose Equal or NotEqual for Bool returning functions. Returning false");
-                    return false;
+                    if (comparator == ConditionComparator.Equal)
+                    {
+                        // True means 0, false is otherwise... ik. Backwards
+                        // In casee I forget why: Remember in architecture, True means (A - B) = 0. Meaning they are the same
+                        // Compare() is a true boolean evaluation. So If checking equal, you want to check that there is no difference i.e.
+                        // result is 0.
+
+                        return Compare(retVal, comparator);
+                    }
+                    else if (comparator == ConditionComparator.NotEqual)
+                    {
+                        // Because we are checking NotEqual, that means we are checking that there IS a difference. In other words,
+                        // returnedValue should NOT be 0.
+
+                        return Compare(retVal, comparator);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Only choose Equal or NotEqual for Bool returning functions. Returning false");
+                        return false;
+                    }
+
+                    */
                 }
 
-                */
+                Debug.LogWarning($"{function} Does not return a boolean. ConditionFunction returning false");
             }
 
-            Debug.LogWarning($"{function} Does not return a boolean. ConditionFunction returning false");
+            catch (Exception e)
+            {
+                Debug.LogWarning($"{this} Evaluation crashed. This is a noteworthy issue. Please debug and share info with EZ. Returning true");
+                Debug.LogException(e);
+
+                // We crash if this is build. Otherwise, we return false in editor mode
+#if !UNITY_EDITOR
+                    throw;
+#endif
+            }
             return false;
+
         }
 
         public static string ComparatorString(ConditionComparator comparator)
@@ -293,8 +312,9 @@ namespace EZConditions
         {
             string OrTxt = (OR) ? "OR" : "AND";
             string Param2Txt = (string.IsNullOrEmpty(param2Value)) ? "Null" : param2Value;
+            string MethodTxt = (string.IsNullOrEmpty(MethodName)) ? "NoFunction" : MethodName; 
 
-            return $"{Obj}.{MethodName} {ComparatorString(Comparator)} {Param2Txt} {OrTxt}";
+            return $"{Obj}.{MethodTxt} {ComparatorString(Comparator)} {Param2Txt} {OrTxt}";
         }
 
         /* Eh Can be nice to have I suppose

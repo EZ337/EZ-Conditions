@@ -20,57 +20,72 @@ namespace EZConditions
             bool evaluatingOrGroup = false;
             bool orGroupResult = false;
 
-            // Loop through all conditions and check their validity
-            // If any condition returns false, this whole thing is false. Otherwise,
-            // We return true
-            // Conditions are evaluated with OR Superiority. Meaning A*B+C*D+E results in A*(B+C)*(D+E)
-            for (int i = 0; i < Conditions.Count; i++)
+            try
             {
-                // Short circuit if at any point, our running total is false
-                if (!totalLogic) { break; }
-
-                Condition condition = Conditions[i];
-                bool currentResult = condition;
-
-                // If this condition is an OR condition, Enable orGroupLogic
-                if (condition.OR)
+                // Loop through all conditions and check their validity
+                // If any condition returns false, this whole thing is false. Otherwise,
+                // We return true
+                // Conditions are evaluated with OR Superiority. Meaning A*B+C*D+E results in A*(B+C)*(D+E)
+                for (int i = 0; i < Conditions.Count; i++)
                 {
-                    evaluatingOrGroup = true;
-                    // the total of the orGroup so far is true or whatever this condition's result is
-                    orGroupResult = orGroupResult || currentResult;
+                    // Short circuit if at any point, our running total is false
+                    if (!totalLogic) { break; }
 
-                    if (debug)
-                    {
-                        Debug.Log($"OR Condition: {condition} evaluated to {currentResult}. Current OR Group Result: {orGroupResult}");
-                    }
+                    Condition condition = Conditions[i];
+                    bool currentResult = condition;
 
-                    // If it's the last condition in our list, finalize the OR group evaluation
-                    if (i == Conditions.Count - 1)
+                    // If this condition is an OR condition, Enable orGroupLogic
+                    if (condition.OR)
                     {
-                        totalLogic = totalLogic && orGroupResult;
-                    }
-                }
-                else
-                {
-                    // If this is an AND condition mixed with preceding OR conditions
-                    if (evaluatingOrGroup)
-                    {
-                        // Finalize the OR group evaluation
-                        totalLogic = totalLogic && (orGroupResult || currentResult);
-                        evaluatingOrGroup = false;
-                        orGroupResult = false;
-                    }
-                    else if (!currentResult)
-                    {
-                        totalLogic = currentResult;
+                        evaluatingOrGroup = true;
+                        // the total of the orGroup so far is true or whatever this condition's result is
+                        orGroupResult = orGroupResult || currentResult;
+
                         if (debug)
                         {
-                            Debug.Log($"{condition} is False.");
+                            Debug.Log($"OR Condition: {condition} evaluated to {currentResult}. Current OR Group Result: {orGroupResult}");
+                        }
+
+                        // If it's the last condition in our list, finalize the OR group evaluation
+                        if (i == Conditions.Count - 1)
+                        {
+                            totalLogic = totalLogic && orGroupResult;
                         }
                     }
-                }
+                    else
+                    {
+                        // If this is an AND condition mixed with preceding OR conditions
+                        if (evaluatingOrGroup)
+                        {
+                            // Finalize the OR group evaluation
+                            totalLogic = totalLogic && (orGroupResult || currentResult);
+                            evaluatingOrGroup = false;
+                            orGroupResult = false;
+                        }
+                        else if (!currentResult)
+                        {
+                            totalLogic = currentResult;
+                            if (debug)
+                            {
+                                Debug.Log($"{condition} is False.");
+                            }
+                        }
+                    }
 
+                }
             }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning("Condition Manager crashed. This is a noteworthy issue. Please try and debug and report to EZ with information. Returning false...");
+                Debug.LogException(e);
+
+                // We crash if this is build. Otherwise, we return false in editor mode
+#if !UNITY_EDITOR
+                    throw;
+#endif
+                totalLogic = false;
+            }
+
 
             if (debug)
             {
