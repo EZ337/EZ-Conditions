@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace EZConditions
 {
-    public class Character : MonoBehaviour
+    public class EZConditionsSample1 : MonoBehaviour
     {
         [field : SerializeField]
         [Condition(typeof(string))]

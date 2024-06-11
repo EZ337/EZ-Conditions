@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace EZConditions
 {
-    public class Condition2 : MonoBehaviour
+    public class EZConditionsSample2 : MonoBehaviour
     {
         [SerializeField]
         private bool inDialogue;
