@@ -14,13 +14,14 @@ using Debug = UnityEngine.Debug;
 
 namespace EZConditions
 {
-    [CustomEditor(typeof(ConditionManager))]
-    public class ConditionManagerInspector : Editor
+    [CustomEditor(typeof(ConditionManagerComponent))]
+    public class ConditionManagerComponentInspector : Editor
     {
 
         public VisualTreeAsset VisualTree;
         public DropdownField conditionField;
         public EnumField comparatorField;
+        public EnumField enumCompare;
         public ObjectField param1Field;
         public IntegerField intCompare;
         public FloatField floatCompare;
@@ -61,6 +62,7 @@ namespace EZConditions
             param1Field = root.Q<ObjectField>("param1");
             conditionField = root.Q<DropdownField>("cond-func");
             comparatorField = root.Q<EnumField>("comparator");
+            enumCompare = root.Q<EnumField>("enum-compare");
             intCompare = root.Q<IntegerField>("int-compare");
             floatCompare = root.Q<FloatField>("float-compare");
             stringCompare = root.Q<TextField>("string-compare");
@@ -92,9 +94,9 @@ namespace EZConditions
         /// <param name="component">The object we are querying</param>
         private void PopulateConditions(UnityEngine.Object component)
         {
-            // Get all methods and properties with ConditionAttribute
+            // Get only public methods and properties with ConditionAttribute
             List<MemberInfo> members = component.GetType()
-                .GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .GetMembers(BindingFlags.Instance | BindingFlags.Public)
                 .Where(member => (member is MethodInfo || member is PropertyInfo) &&
                                  member.GetCustomAttribute<ConditionAttribute>() != null)
                 .ToList();
@@ -215,6 +217,14 @@ namespace EZConditions
                     ShowElement(boolCompare);
                     selectedArgument = boolCompare;
                 }
+                else if (attrType.IsEnum)
+                {
+                    ShowElement(enumCompare);
+                    selectedArgument = enumCompare;
+                    // Get the type of the enum
+                    System.Enum enumType = (System.Enum) attrType.GetEnumValues().GetValue(0);
+                    enumCompare.Init(enumType);
+                }
                 else
                 {
                     ShowElement(param2Field);
@@ -301,7 +311,7 @@ namespace EZConditions
 
             //Debug.Log("Created Condition: " + condition);
             // Add the new Condition to the list
-            if (target is ConditionManager conditionManager)
+            if (target is ConditionManagerComponent conditionManager)
             {
                 conditionManager.Conditions.Add(condition);
                 EditorUtility.SetDirty(target);
@@ -329,7 +339,7 @@ namespace EZConditions
             }
             */
 
-            if (target is ConditionManager conditionManager)
+            if (target is ConditionManagerComponent conditionManager)
             {
                 conditionManager.EvaluateConditions(true);
             }
@@ -348,6 +358,8 @@ namespace EZConditions
                 return objectField.value;
             else if (elm is Toggle toggle)
                 return toggle.value;
+            else if (elm is EnumField enumField)
+                return enumField.value; 
 
             return null;
         }
@@ -374,6 +386,7 @@ namespace EZConditions
             compareBtn.style.display = DisplayStyle.Flex;
             createConditionBtn.style.display = DisplayStyle.Flex;
             ORField.style.display = DisplayStyle.Flex;
+            enumCompare.style.display = DisplayStyle.Flex;
         }
 
         private void HideAllOptions()
@@ -390,6 +403,7 @@ namespace EZConditions
             //compareBtn.style.display = DisplayStyle.None;
             createConditionBtn.style.display = DisplayStyle.None;
             ORField.style.display = DisplayStyle.None;
+            enumCompare.style.display = DisplayStyle.None;
         }
 
         #endregion

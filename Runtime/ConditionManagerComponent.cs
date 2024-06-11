@@ -5,8 +5,7 @@ using EZConditions;
 
 namespace EZConditions
 {
-    [System.Serializable]
-    public class ConditionManager
+    public class ConditionManagerComponent : MonoBehaviour
     {
         /// <summary>
         /// List of conditions
@@ -76,7 +75,7 @@ namespace EZConditions
             }
             catch (System.Exception e)
             {
-                Debug.LogWarning("Condition Manager crashed. This is a noteworthy issue. Please try and debug and report to EZ with information. Returning false...");
+                Debug.LogWarning("Condition Manager Component crashed. This is a noteworthy issue. Please try and debug and report to EZ with information. Returning false...");
                 Debug.LogException(e);
 
                 // We crash if this is build. Otherwise, we return false in editor mode

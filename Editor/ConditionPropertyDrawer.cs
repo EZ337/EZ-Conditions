@@ -60,9 +60,10 @@ namespace EZConditions
                 EditorGUI.EndProperty();
 
             }
-            catch (System.Exception)
+            catch (System.Exception e)
             {
-                Debug.LogError("Failed to build Custom Conditions Property. Building Default Look");
+                Debug.LogWarning("Failed to build Custom Conditions Property. Building Default Look");
+                Debug.LogError(e);
                 base.OnGUI(position, property, label);
             }
         }
