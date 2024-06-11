@@ -23,7 +23,7 @@ namespace EZConditions
         public Collider Collider;
 
 
-        [Condition]
+        [Condition(typeof(Collider))]
         public void VoidFunction()
         {
             Debug.Log($"{Name} called VoidFunction");

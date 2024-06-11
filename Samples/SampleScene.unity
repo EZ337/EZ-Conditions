@@ -268,14 +268,14 @@ MonoBehaviour:
   enumTest2: 0
   conditionManager:
     Conditions:
-    - obj: {fileID: 142423403}
+    - obj: {fileID: 189146401}
       comparator: 0
-      or: 0
-      methodName: VoidFunction
+      or: 1
+      methodName: HasCollider
       param2Type: 
       param2Value: 
       param2AsUnityObject: {fileID: 0}
-      param2Evaluation: 0
+      param2Evaluation: 1
     - obj: {fileID: 189146401}
       comparator: 0
       or: 0
@@ -284,13 +284,22 @@ MonoBehaviour:
       param2Value: steve
       param2AsUnityObject: {fileID: 0}
       param2Evaluation: 0
-    - obj: {fileID: 189146401}
+    - obj: {fileID: 142423403}
       comparator: 0
       or: 1
-      methodName: HasCollider
+      methodName: VoidFunction
       param2Type: 
       param2Value: 
       param2AsUnityObject: {fileID: 0}
+      param2Evaluation: 0
+    - obj: {fileID: 142423403}
+      comparator: 0
+      or: 0
+      methodName: VoidFunction
+      param2Type: UnityEngine.CapsuleCollider, UnityEngine.PhysicsModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+      param2Value: ConditionTester (UnityEngine.CapsuleCollider)
+      param2AsUnityObject: {fileID: 142423399}
       param2Evaluation: 1
 --- !u!114 &142423405
 MonoBehaviour:
