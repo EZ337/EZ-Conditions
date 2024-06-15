@@ -22,6 +22,7 @@ namespace EZConditions
         public DropdownField conditionField;
         public EnumField comparatorField;
         public EnumField enumCompare;
+        public EnumFlagsField enumFlagsCompare;
         public ObjectField param1Field;
         public IntegerField intCompare;
         public FloatField floatCompare;
@@ -63,6 +64,7 @@ namespace EZConditions
             conditionField = root.Q<DropdownField>("cond-func");
             comparatorField = root.Q<EnumField>("comparator");
             enumCompare = root.Q<EnumField>("enum-compare");
+            enumFlagsCompare = root.Q<EnumFlagsField>("enumFlags-compare");
             intCompare = root.Q<IntegerField>("int-compare");
             floatCompare = root.Q<FloatField>("float-compare");
             stringCompare = root.Q<TextField>("string-compare");
@@ -219,11 +221,21 @@ namespace EZConditions
                 }
                 else if (attrType.IsEnum)
                 {
-                    ShowElement(enumCompare);
-                    selectedArgument = enumCompare;
-                    // Get the type of the enum
-                    System.Enum enumType = (System.Enum) attrType.GetEnumValues().GetValue(0);
-                    enumCompare.Init(enumType);
+                    System.Enum enumType = (System.Enum)attrType.GetEnumValues().GetValue(0);
+
+                    // Enum Flags
+                    if (attrType.GetCustomAttribute<FlagsAttribute>(true) != null)
+                    {
+                        ShowElement(enumFlagsCompare);
+                        selectedArgument = enumFlagsCompare;
+                        enumFlagsCompare.Init(enumType);
+                    }
+                    else // Regular Enum
+                    {
+                        ShowElement(enumCompare);
+                        selectedArgument = enumCompare;
+                        enumCompare.Init(enumType);
+                    }
                 }
                 else
                 {
@@ -359,7 +371,9 @@ namespace EZConditions
             else if (elm is Toggle toggle)
                 return toggle.value;
             else if (elm is EnumField enumField)
-                return enumField.value; 
+                return enumField.value;
+            else if (elm is EnumFlagsField enumFlagsField)
+                return enumFlagsField.value;
 
             return null;
         }
@@ -387,6 +401,7 @@ namespace EZConditions
             createConditionBtn.style.display = DisplayStyle.Flex;
             ORField.style.display = DisplayStyle.Flex;
             enumCompare.style.display = DisplayStyle.Flex;
+            enumFlagsCompare.style.display = DisplayStyle.Flex;
         }
 
         private void HideAllOptions()
@@ -404,6 +419,7 @@ namespace EZConditions
             createConditionBtn.style.display = DisplayStyle.None;
             ORField.style.display = DisplayStyle.None;
             enumCompare.style.display = DisplayStyle.None;
+            enumFlagsCompare.style.display = DisplayStyle.None;
         }
 
         #endregion
