@@ -86,11 +86,11 @@ public class ConditionManagerWindow : EditorWindow
         param2Field = root.Q<ObjectField>("param2");
         ORField = root.Q<Toggle>("OR");
 
-        if (Selection.activeGameObject == null)
+        if (AssetDatabase.Contains(ConditionManagerWindow.ConditionManager.serializedObject.targetObject))
         {
             param1Field.allowSceneObjects = false;
             param2Field.allowSceneObjects = false;
-        } 
+        }
 
         compareBtn = root.Q<Button>("evaluateCondition");
         compareBtn.RegisterCallback<ClickEvent>(EvaluateCondition);
