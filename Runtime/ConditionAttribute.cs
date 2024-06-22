@@ -12,6 +12,40 @@ namespace EZConditions
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = false)]
     public class ConditionAttribute : Attribute
     {
+        /// <summary>
+        /// Whether the ConditionManager is expected to handle this function's returned.
+        /// If true, Specify ComparedType to show the appropriate field to use for comparison.
+        /// Compared type is ignored if this value is false
+        /// </summary>
+        public bool CompareReturnedValue { get; private set; } = false;
+
+        /// <summary>
+        /// The type we compare against the returned value. <b>NOTE: whatever ComparedType is must implement IComparable</b>
+        /// </summary>
+        public Type ComparedType { get; private set; } = null;
+
+        /// <summary>
+        /// Up to 16 parameters. If looping through and a null is encountered, treats everything else as null
+        /// Defaults to no argument
+        /// </summary>
+        public Type[] Parameters { get; private set; } = new Type[0];
+
+        public ConditionAttribute(Type[] Parameters = null, bool CompareReturnedValue = false, Type ComparedType = null)
+        {
+            if (Parameters != null)
+            {
+                this.Parameters = Parameters;
+            }
+
+            this.CompareReturnedValue = CompareReturnedValue;
+            this.ComparedType = ComparedType;
+        }
+
+        public void Condition()
+        {
+
+        }
+
 
         /// <summary>
         /// Type of the first parameter. Typically the class this method beleongs to

@@ -5,16 +5,18 @@
         <ui:Button text="Test Conditions" parse-escape-sequences="true" display-tooltip-when-elided="true" name="evaluateCondition" />
         <ui:Foldout text="Create New Condition" name="create-cond-foldout" tooltip="Create or Test a condition" view-data-key="create-condition-data-key" style="padding-left: 12px;">
             <ui:VisualElement style="flex-grow: 1;">
-                <uie:ObjectField label="Param 1" name="param1" type="UnityEngine.Object, UnityEngine.CoreModule" />
+                <uie:ObjectField label="Object" name="param1" type="UnityEngine.Object, UnityEngine.CoreModule" />
                 <ui:DropdownField label="Condition" index="0" choices="No Function" name="cond-func" />
                 <ui:EnumField label="Comparer" type="EZConditions.ConditionComparator, ez337.ezconditions" name="comparator" />
-                <ui:IntegerField value="0" name="int-compare" label="Integer" />
-                <ui:FloatField label="Float" value="0" name="float-compare" />
-                <ui:TextField picking-mode="Ignore" label="Text" name="string-compare" />
-                <ui:EnumField label="Enum" type="EZConditions.EZConditionsSample2+Condition2EnumTest, ezconditions.sample" name="enum-compare" />
-                <uie:EnumFlagsField label="EnumFlags" type="UnityEngine.UIElements.UsageHints, UnityEngine.UIElementsModule" value="None" name="enumFlags-compare" />
-                <ui:Toggle label="Bool" name="bool-compare" />
-                <uie:ObjectField label="Param 2" name="param2" />
+                <ui:VisualElement name="param-fields" style="flex-grow: 1;" />
+                <ui:VisualElement name="divider" style="flex-grow: 1; min-height: 2px; background-color: rgb(88, 88, 88); margin-top: 5px; margin-bottom: 5px;" />
+                <ui:IntegerField value="0" name="int-compare" label="ComparedValue (int)" />
+                <ui:FloatField label="ComparedValue (float)" value="0" name="float-compare" />
+                <ui:TextField picking-mode="Ignore" label="ComparedValue (string)" name="string-compare" />
+                <ui:EnumField label="ComparedValue (Enum)" type="EZConditions.EZConditionsSample2+Condition2EnumTest, ezconditions.sample" name="enum-compare" />
+                <uie:EnumFlagsField label="ComparedValue (EnumFlags)" type="UnityEngine.UIElements.UsageHints, UnityEngine.UIElementsModule" value="None" name="enumFlags-compare" />
+                <ui:Toggle label="ComparedValue (Bool)" name="bool-compare" />
+                <uie:ObjectField label="ComparedValue (Object)" name="param2" />
                 <ui:Toggle label="OR" name="OR" tooltip="Check this button if you want the condition to be an OR condition. Otherwise, it&apos;s an AND condition" />
                 <ui:Button text="Create Condition" parse-escape-sequences="true" display-tooltip-when-elided="true" name="createCondition" />
             </ui:VisualElement>

@@ -8,6 +8,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Linq;
+using static PlasticGui.Configuration.OAuth.GetOauthProviders.AuthInfo;
 
 public class ConditionManagerWindow : EditorWindow
 {
@@ -28,6 +29,7 @@ public class ConditionManagerWindow : EditorWindow
     public Toggle ORField;
     public Button compareBtn;
     public Button createConditionBtn;
+    public VisualElement paramContainer;
 
     private List<MemberInfo> methods = new List<MemberInfo>();
     private MemberInfo selectedMethod;
@@ -43,10 +45,7 @@ public class ConditionManagerWindow : EditorWindow
 
     private void OnDisable()
     {
-        if (ConditionManager != null)
-        {
-            ConditionManager.Dispose();
-        }
+        ConditionManager?.Dispose();
     }
 
     public void CreateGUI()
@@ -72,7 +71,7 @@ public class ConditionManagerWindow : EditorWindow
         }
         else
         {
-            Debug.Log("No Valid ConditionManager");
+            //Debug.Log("No Valid ConditionManager");
             this.Close();
         }
 
@@ -87,12 +86,22 @@ public class ConditionManagerWindow : EditorWindow
         boolCompare = root.Q<Toggle>("bool-compare");
         param2Field = root.Q<ObjectField>("param2");
         ORField = root.Q<Toggle>("OR");
+        paramContainer = rootVisualElement.Q<VisualElement>("param-fields");
 
-        if (AssetDatabase.Contains(ConditionManagerWindow.ConditionManager.serializedObject.targetObject))
+        // Disable Scene objects if the item is an asset
+        try
         {
-            param1Field.allowSceneObjects = false;
-            param2Field.allowSceneObjects = false;
+            if (AssetDatabase.Contains(ConditionManagerWindow.ConditionManager.serializedObject.targetObject))
+            {
+                param1Field.allowSceneObjects = false;
+                param2Field.allowSceneObjects = false;
+            }
         }
+        catch
+        {
+            this.Close();
+        }
+
 
         compareBtn = root.Q<Button>("evaluateCondition");
         compareBtn.RegisterCallback<ClickEvent>(EvaluateCondition);
@@ -200,51 +209,116 @@ public class ConditionManagerWindow : EditorWindow
         //Debug.Log("MethodInfo at index is " + methods[index]);
         conditionField.SetValueWithoutNotify(evt.newValue.Replace('/', '.'));
 
-        SetUpConditionWindow(selectedMethod);
+        PresentParameters(selectedMethod);
+        //SetUpConditionWindow(selectedMethod);
     }
 
-    private void SetUpConditionWindow(MemberInfo method)
+
+    private void PresentParameters(MemberInfo method)
+    {
+        paramContainer.Clear();
+
+        ConditionAttribute attr = method.GetCustomAttribute<ConditionAttribute>();
+        MethodInfo methodInfo = (method is PropertyInfo property) ? property.GetGetMethod(true) : (MethodInfo)method;
+        short paramIndex = 0;
+
+        foreach ( ParameterInfo parameter in methodInfo.GetParameters() )
+        {
+            Type type = parameter.ParameterType;
+            ++paramIndex;
+            VisualElement parameterField = null;
+            if (type == typeof(int))
+            {
+                parameterField = new IntegerField($"param{paramIndex} (int)");
+            }
+            else if (type == typeof(float))
+            {
+                parameterField = new FloatField($"param{paramIndex} (float)");
+            }
+            else if (type == typeof(string))
+            {
+                parameterField = new TextField($"param{paramIndex} (string)");
+            }
+            else if (type == typeof(bool))
+            {
+                parameterField = new Toggle($"param{paramIndex} (bool)");
+            }
+            else if (type.IsEnum)
+            {
+                System.Enum enumType = (System.Enum)type.GetEnumValues().GetValue(0);
+
+                // Enum Flags
+                if (type.GetCustomAttribute<FlagsAttribute>(true) != null)
+                {
+                    parameterField = new EnumFlagsField($"param{paramIndex}", enumType);
+                }
+                else // Regular Enum
+                {
+                    parameterField = new EnumField($"param{paramIndex}", enumType);
+                }
+            }
+            else
+            {
+                parameterField = new ObjectField($"param{paramIndex}");
+                try
+                {
+                    ((ObjectField)parameterField).objectType = type;
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning("Unable to properly accept type {type}");
+                    Debug.LogError(ex);
+                }
+            }
+
+            paramContainer.Add(parameterField);
+        }
+
+        SetUpConditionWindow(methodInfo);
+    }
+
+    private void SetUpConditionWindow(MethodInfo method)
     {
         ConditionAttribute attr = method.GetCustomAttribute<ConditionAttribute>();
         // NOTE: Room to deal with Param1 as well. For now, param1 is neglected.
         // In future, param1 could potentially support condition checking for methods that do not
         // belong to the calling class... Idk if we should support that. But just in case.
 
-        Type attrType = attr.Param2;
+        Type returnType = method.ReturnType;
 
         HideAllOptions();
         ShowElement(conditionField);
         // Show the appropriate param2 field
-        if (attrType != null)
+        if (returnType != typeof(void))
         {
             ShowElement(comparatorField);
 
-            if (attrType == typeof(int))
+            if (returnType == typeof(int))
             {
                 ShowElement(intCompare);
                 selectedArgument = intCompare;
             }
-            else if (attrType == typeof(float))
+            else if (returnType == typeof(float))
             {
                 ShowElement(floatCompare);
                 selectedArgument = floatCompare;
             }
-            else if (attrType == typeof(string))
+            else if (returnType == typeof(string))
             {
                 ShowElement(stringCompare);
                 selectedArgument = stringCompare;
             }
-            else if (attrType == typeof(bool))
+            else if (returnType == typeof(bool))
             {
                 ShowElement(boolCompare);
                 selectedArgument = boolCompare;
             }
-            else if (attrType.IsEnum)
+            else if (returnType.IsEnum)
             {
-                System.Enum enumType = (System.Enum)attrType.GetEnumValues().GetValue(0);
+                System.Enum enumType = (System.Enum)returnType.GetEnumValues().GetValue(0);
 
                 // Enum Flags
-                if (attrType.GetCustomAttribute<FlagsAttribute>(true) != null)
+                if (returnType.GetCustomAttribute<FlagsAttribute>(true) != null)
                 {
                     ShowElement(enumFlagsCompare);
                     selectedArgument = enumFlagsCompare;
@@ -263,20 +337,24 @@ public class ConditionManagerWindow : EditorWindow
                 HideElement(comparatorField);
                 try
                 {
-                    param2Field.objectType = attrType;
+                    param2Field.objectType = returnType;
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning($"Unable to properly accept type {attrType}. Verify or Let EZ Know");
+                    Debug.LogWarning($"Unable to properly accept type {returnType}. Verify or Let EZ Know");
                     Debug.LogError(ex);
                 }
                 selectedArgument = param2Field;
             }
-        }
 
-        ShowElement(ORField);
-        ShowElement(compareBtn);
-        ShowElement(createConditionBtn);
+            ShowElement(ORField);
+            ShowElement(compareBtn);
+            ShowElement(createConditionBtn);
+        }
+        else
+        {
+            Debug.LogWarning($"{method.Name} returns void. Condition Function must return IComparable");
+        }
     }
 
 
