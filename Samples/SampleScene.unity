@@ -267,40 +267,7 @@ MonoBehaviour:
   enumTest: 1
   enumTest2: 0
   conditionManager:
-    Conditions:
-    - obj: {fileID: 189146401}
-      comparator: 0
-      or: 1
-      methodName: HasCollider
-      param2Type: 
-      param2Value: 
-      param2AsUnityObject: {fileID: 0}
-      param2Evaluation: 1
-    - obj: {fileID: 189146401}
-      comparator: 0
-      or: 0
-      methodName: get_Name
-      param2Type: System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-      param2Value: steve
-      param2AsUnityObject: {fileID: 0}
-      param2Evaluation: 0
-    - obj: {fileID: 142423403}
-      comparator: 0
-      or: 1
-      methodName: VoidFunction
-      param2Type: 
-      param2Value: 
-      param2AsUnityObject: {fileID: 0}
-      param2Evaluation: 0
-    - obj: {fileID: 142423403}
-      comparator: 0
-      or: 0
-      methodName: VoidFunction
-      param2Type: UnityEngine.CapsuleCollider, UnityEngine.PhysicsModule, Version=0.0.0.0,
-        Culture=neutral, PublicKeyToken=null
-      param2Value: ConditionTester (UnityEngine.CapsuleCollider)
-      param2AsUnityObject: {fileID: 142423399}
-      param2Evaluation: 1
+    Conditions: []
 --- !u!114 &142423405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -348,56 +315,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0080e6fec2a51344b8d8e64cb0f93a47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Conditions:
-  - obj: {fileID: 142423403}
-    comparator: 0
-    or: 1
-    methodName: HasCollider
-    param2Type: 
-    param2Value: 
-    param2AsUnityObject: {fileID: 0}
-    param2Evaluation: 1
-  - obj: {fileID: 142423403}
-    comparator: 0
-    or: 1
-    methodName: HasCollider
-    param2Type: UnityEngine.CapsuleCollider, UnityEngine.PhysicsModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-    param2Value: Capsule (UnityEngine.CapsuleCollider)
-    param2AsUnityObject: {fileID: 142423399}
-    param2Evaluation: 1
-  - obj: {fileID: 142423403}
-    comparator: 0
-    or: 0
-    methodName: VoidFunction
-    param2Type: 
-    param2Value: 
-    param2AsUnityObject: {fileID: 0}
-    param2Evaluation: 0
-  - obj: {fileID: 189146401}
-    comparator: 0
-    or: 0
-    methodName: GetDeathXP
-    param2Type: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-    param2Value: 50
-    param2AsUnityObject: {fileID: 0}
-    param2Evaluation: 0
-  - obj: {fileID: 142423404}
-    comparator: 3
-    or: 0
-    methodName: GetInventoryRatio
-    param2Type: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-    param2Value: 80
-    param2AsUnityObject: {fileID: 0}
-    param2Evaluation: 0
-  - obj: {fileID: 142423404}
-    comparator: 0
-    or: 0
-    methodName: InDialogue
-    param2Type: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-    param2Value: True
-    param2AsUnityObject: {fileID: 0}
-    param2Evaluation: 0
+  Conditions: []
 --- !u!114 &189146401
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -834,6 +752,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ConditionManager:
     Conditions: []
+  <MoveOption>k__BackingField: 0
+  <WalkOption>k__BackingField: 0
+  LayerMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

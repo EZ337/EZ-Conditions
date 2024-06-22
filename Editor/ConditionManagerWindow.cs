@@ -117,9 +117,43 @@ public class ConditionManagerWindow : EditorWindow
 
     }
 
+    /// <summary>
+    /// Event called when the ObjectField changes value
+    /// </summary>
+    /// <param name="evt"></param>
+    private void OnObjectChange(ChangeEvent<UnityEngine.Object> evt)
+    {
+        HideAllOptions();
+        if (evt.newValue != null)
+        {
+            ShowElement(conditionField);
+            // Clear Dropdown and Methods list
+            ClearDropDown();
+
+            // If it's a gameObject, get all components on it and get the methods/properties with Condtion Attribute
+            if (evt.newValue.GetType() == typeof(GameObject))
+            {
+                //Debug.Log("We got a gameObject");
+                // Cast to gameObject and get the components
+                Component[] components = ((GameObject)param1Field.value).GetComponents<Component>();
+
+                foreach (Component component in components)
+                {
+                    //Debug.Log(item);
+                    PopulateConditions(component);
+                }
+            }
+            else
+            {
+                PopulateConditions(evt.newValue);
+            }
+
+        }
+
+    }
 
     /// <summary>
-    /// Gets all valid MethodInfo and PropertyInfos that are public, private, or protected
+    /// Gets all valid MethodInfo and PropertyInfos that are public
     /// AND have the [Condition] attribute on them
     /// </summary>
     /// <param name="component">The object we are querying</param>
@@ -161,41 +195,6 @@ public class ConditionManagerWindow : EditorWindow
     }
 
     /// <summary>
-    /// Event called when the ObjectField changes value
-    /// </summary>
-    /// <param name="evt"></param>
-    private void OnObjectChange(ChangeEvent<UnityEngine.Object> evt)
-    {
-        HideAllOptions();
-        if (evt.newValue != null)
-        {
-            ShowElement(conditionField);
-            // Clear Dropdown and Methods list
-            ClearDropDown();
-
-            // If it's a gameObject, get all components on it and get the methods/properties with Condtion Attribute
-            if (evt.newValue.GetType() == typeof(GameObject))
-            {
-                //Debug.Log("We got a gameObject");
-                // Cast to gameObject and get the components
-                Component[] components = ((GameObject)param1Field.value).GetComponents<Component>();
-
-                foreach (Component component in components)
-                {
-                    //Debug.Log(item);
-                    PopulateConditions(component);
-                }
-            }
-            else
-            {
-                PopulateConditions(evt.newValue);
-            }
-
-        }
-
-    }
-
-    /// <summary>
     /// Event called when we pick something in the dropdown
     /// </summary>
     /// <param name="evt"></param>
@@ -210,18 +209,16 @@ public class ConditionManagerWindow : EditorWindow
         conditionField.SetValueWithoutNotify(evt.newValue.Replace('/', '.'));
 
         PresentParameters(selectedMethod);
-        //SetUpConditionWindow(selectedMethod);
+        ShowElement(paramContainer);
     }
-
 
     private void PresentParameters(MemberInfo method)
     {
         paramContainer.Clear();
-
-        ConditionAttribute attr = method.GetCustomAttribute<ConditionAttribute>();
         MethodInfo methodInfo = (method is PropertyInfo property) ? property.GetGetMethod(true) : (MethodInfo)method;
         short paramIndex = 0;
 
+        // Show a parameter field for each parameter on this method
         foreach ( ParameterInfo parameter in methodInfo.GetParameters() )
         {
             Type type = parameter.ParameterType;
@@ -274,21 +271,22 @@ public class ConditionManagerWindow : EditorWindow
             paramContainer.Add(parameterField);
         }
 
+        // 
         SetUpConditionWindow(methodInfo);
     }
 
+    /// <summary>
+    /// Final creation process. Presents comparison field and create condition button
+    /// </summary>
+    /// <param name="method"></param>
     private void SetUpConditionWindow(MethodInfo method)
     {
-        ConditionAttribute attr = method.GetCustomAttribute<ConditionAttribute>();
-        // NOTE: Room to deal with Param1 as well. For now, param1 is neglected.
-        // In future, param1 could potentially support condition checking for methods that do not
-        // belong to the calling class... Idk if we should support that. But just in case.
 
         Type returnType = method.ReturnType;
 
         HideAllOptions();
         ShowElement(conditionField);
-        // Show the appropriate param2 field
+        // Show the appropriate field to compare to based on the method's return type
         if (returnType != typeof(void))
         {
             ShowElement(comparatorField);
@@ -408,6 +406,16 @@ public class ConditionManagerWindow : EditorWindow
         Tuple<System.Object, MethodInfo> values = PreProcess();
         Condition condition;
 
+        List<SerializableObjectWrapper> serializedParameters = new List<SerializableObjectWrapper>();
+        foreach (VisualElement parameter in paramContainer.Children())
+        {
+            serializedParameters.Add(new SerializableObjectWrapper(GetElementValue(parameter)));
+        }
+
+        SerializableObjectWrapper comparedValue = new SerializableObjectWrapper(GetElementValue(selectedArgument));
+        condition = new(values.Item1, values.Item2, serializedParameters.ToArray(), (ConditionComparator)comparatorField.value, comparedValue, ORField.value);
+
+        /*
         if (selectedArgument is ObjectField)
         {
             // Evaluate param2 as an argument for the function
@@ -418,6 +426,7 @@ public class ConditionManagerWindow : EditorWindow
             // Evaluate (Instance.MethodInfo() lt/gt/eq Param2)
             condition = new(values.Item1, values.Item2, (ConditionComparator)comparatorField.value, GetElementValue(selectedArgument), ORField.value, false);
         }
+        */
 
         //Debug.Log("Created Condition: " + condition);
         // Add the new Condition to the list
@@ -502,6 +511,7 @@ public class ConditionManagerWindow : EditorWindow
         ORField.style.display = DisplayStyle.Flex;
         enumCompare.style.display = DisplayStyle.Flex;
         enumFlagsCompare.style.display = DisplayStyle.Flex;
+        paramContainer.style.display = DisplayStyle.Flex;
     }
 
     private void HideAllOptions()
@@ -520,6 +530,7 @@ public class ConditionManagerWindow : EditorWindow
         ORField.style.display = DisplayStyle.None;
         enumCompare.style.display = DisplayStyle.None;
         enumFlagsCompare.style.display = DisplayStyle.None;
+        paramContainer.style.display = DisplayStyle.None;
     }
 
     #endregion

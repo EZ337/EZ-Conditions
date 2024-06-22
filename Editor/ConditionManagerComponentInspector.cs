@@ -310,6 +310,7 @@ namespace EZConditions
             Tuple<System.Object, MethodInfo> values = PreProcess();
             Condition condition;
 
+            /* Depracated
             if (selectedArgument is ObjectField)
             {
                 // Evaluate param2 as an argument for the function
@@ -320,7 +321,9 @@ namespace EZConditions
                 // Evaluate (Instance.MethodInfo() lt/gt/eq Param2)
                 condition = new(values.Item1, values.Item2, (ConditionComparator)comparatorField.value, GetElementValue(selectedArgument), ORField.value, false);
             }
+            */
 
+            /*
             //Debug.Log("Created Condition: " + condition);
             // Add the new Condition to the list
             if (target is ConditionManagerComponent conditionManager)
@@ -328,6 +331,8 @@ namespace EZConditions
                 conditionManager.Conditions.Add(condition);
                 EditorUtility.SetDirty(target);
             }
+            */
+            Debug.LogWarning("No longer Implemented. Remind EZ");
         }
 
         private void EvaluateCondition(ClickEvent evt)

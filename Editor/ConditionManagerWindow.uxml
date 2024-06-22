@@ -7,9 +7,9 @@
             <ui:VisualElement style="flex-grow: 1;">
                 <uie:ObjectField label="Object" name="param1" type="UnityEngine.Object, UnityEngine.CoreModule" />
                 <ui:DropdownField label="Condition" index="0" choices="No Function" name="cond-func" />
-                <ui:EnumField label="Comparer" type="EZConditions.ConditionComparator, ez337.ezconditions" name="comparator" />
                 <ui:VisualElement name="param-fields" style="flex-grow: 1;" />
                 <ui:VisualElement name="divider" style="flex-grow: 1; min-height: 2px; background-color: rgb(88, 88, 88); margin-top: 5px; margin-bottom: 5px;" />
+                <ui:EnumField label="Comparer" type="EZConditions.ConditionComparator, ez337.ezconditions" name="comparator" />
                 <ui:IntegerField value="0" name="int-compare" label="ComparedValue (int)" />
                 <ui:FloatField label="ComparedValue (float)" value="0" name="float-compare" />
                 <ui:TextField picking-mode="Ignore" label="ComparedValue (string)" name="string-compare" />
