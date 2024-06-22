@@ -41,11 +41,6 @@ namespace EZConditions
             this.ComparedType = ComparedType;
         }
 
-        public void Condition()
-        {
-
-        }
-
 
         /// <summary>
         /// Type of the first parameter. Typically the class this method beleongs to
