@@ -166,7 +166,6 @@ namespace EZConditions
             return false;
         }
 
-
         #region Utility
         public void Reconstruct()
         {

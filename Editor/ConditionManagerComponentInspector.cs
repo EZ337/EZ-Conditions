@@ -185,78 +185,7 @@ namespace EZConditions
 
         private void SetUpConditionWindow(MemberInfo method)
         {
-            ConditionAttribute attr = method.GetCustomAttribute<ConditionAttribute>();
-            // NOTE: Room to deal with Param1 as well. For now, param1 is neglected.
-            // In future, param1 could potentially support condition checking for methods that do not
-            // belong to the calling class... Idk if we should support that. But just in case.
 
-            Type attrType = attr.Param2;
-
-            HideAllOptions();
-            ShowElement(conditionField);
-            // Show the appropriate param2 field
-            if (attrType != null)
-            {
-                ShowElement(comparatorField);
-
-                if (attrType == typeof(int))
-                {
-                    ShowElement(intCompare);
-                    selectedArgument = intCompare;
-                }
-                else if (attrType == typeof(float))
-                {
-                    ShowElement(floatCompare);
-                    selectedArgument = floatCompare;
-                }
-                else if (attrType == typeof(string))
-                {
-                    ShowElement(stringCompare);
-                    selectedArgument = stringCompare;
-                }
-                else if (attrType == typeof(bool))
-                {
-                    ShowElement(boolCompare);
-                    selectedArgument = boolCompare;
-                }
-                else if (attrType.IsEnum)
-                {
-                    System.Enum enumType = (System.Enum)attrType.GetEnumValues().GetValue(0);
-
-                    // Enum Flags
-                    if (attrType.GetCustomAttribute<FlagsAttribute>(true) != null)
-                    {
-                        ShowElement(enumFlagsCompare);
-                        selectedArgument = enumFlagsCompare;
-                        enumFlagsCompare.Init(enumType);
-                    }
-                    else // Regular Enum
-                    {
-                        ShowElement(enumCompare);
-                        selectedArgument = enumCompare;
-                        enumCompare.Init(enumType);
-                    }
-                }
-                else
-                {
-                    ShowElement(param2Field);
-                    HideElement(comparatorField);
-                    try
-                    {
-                        param2Field.objectType = attrType;
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogWarning($"Unable to properly accept type {attrType}. Let EZ Know");
-                        Debug.LogError(ex);
-                    }
-                    selectedArgument = param2Field;
-                }
-            }
-
-            ShowElement(ORField);
-            ShowElement(compareBtn);
-            ShowElement(createConditionBtn);
         }
 
 

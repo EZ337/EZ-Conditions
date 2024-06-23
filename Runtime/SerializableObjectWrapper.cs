@@ -17,7 +17,6 @@ namespace EZConditions
         /// This is assigned if the object is a unityObject otherwise, null
         /// </summary>
         [SerializeField] private UnityEngine.Object UnityObject;
-        [SerializeField] private System.Object obj;
 
         /// <summary>
         /// Serialized version of obj
@@ -34,7 +33,6 @@ namespace EZConditions
                 TypeName = obj.GetType().AssemblyQualifiedName;
                 JsonData = JsonUtility.ToJson(obj);
             }
-            this.obj = obj;
         }
 
         /// <summary>
@@ -47,18 +45,12 @@ namespace EZConditions
             {
                 return UnityObject;
             }
-            if (obj != null)
-            {
-                // caching
-                return obj;
-            }
             if (!string.IsNullOrEmpty(TypeName) && !string.IsNullOrEmpty(JsonData))
             {
                 Type type = Type.GetType(TypeName);
                 if (type != null)
                 {
-                    obj = JsonUtility.FromJson(JsonData, type);
-                    return obj;
+                    return JsonUtility.FromJson(JsonData, type);
                 }
             }
             return null;

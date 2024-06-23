@@ -216,29 +216,27 @@ public class ConditionManagerWindow : EditorWindow
     {
         paramContainer.Clear();
         MethodInfo methodInfo = (method is PropertyInfo property) ? property.GetGetMethod(true) : (MethodInfo)method;
-        short paramIndex = 0;
 
         // Show a parameter field for each parameter on this method
         foreach ( ParameterInfo parameter in methodInfo.GetParameters() )
         {
             Type type = parameter.ParameterType;
-            ++paramIndex;
-            VisualElement parameterField = null;
+            VisualElement parameterField;
             if (type == typeof(int))
             {
-                parameterField = new IntegerField($"param{paramIndex} (int)");
+                parameterField = new IntegerField($"{parameter.Name} (int)");
             }
             else if (type == typeof(float))
             {
-                parameterField = new FloatField($"param{paramIndex} (float)");
+                parameterField = new FloatField($"{parameter.Name} (float)");
             }
             else if (type == typeof(string))
             {
-                parameterField = new TextField($"param{paramIndex} (string)");
+                parameterField = new TextField($"{parameter.Name} (string)");
             }
             else if (type == typeof(bool))
             {
-                parameterField = new Toggle($"param{paramIndex} (bool)");
+                parameterField = new Toggle($"{parameter.Name} (bool)");
             }
             else if (type.IsEnum)
             {
@@ -247,16 +245,16 @@ public class ConditionManagerWindow : EditorWindow
                 // Enum Flags
                 if (type.GetCustomAttribute<FlagsAttribute>(true) != null)
                 {
-                    parameterField = new EnumFlagsField($"param{paramIndex}", enumType);
+                    parameterField = new EnumFlagsField($"{parameter.Name}", enumType);
                 }
                 else // Regular Enum
                 {
-                    parameterField = new EnumField($"param{paramIndex}", enumType);
+                    parameterField = new EnumField($"{parameter.Name}", enumType);
                 }
             }
             else
             {
-                parameterField = new ObjectField($"param{paramIndex}");
+                parameterField = new ObjectField($"{parameter.Name}");
                 try
                 {
                     ((ObjectField)parameterField).objectType = type;
@@ -289,6 +287,21 @@ public class ConditionManagerWindow : EditorWindow
         // Show the appropriate field to compare to based on the method's return type
         if (returnType != typeof(void))
         {
+            try
+            {
+                if (returnType.GetMethod("CompareTo") == null)
+                {
+                    Debug.LogWarning($"Type: {returnType} Does not have a \"CompareTo\" function. Implenent the IComparable interface for this type" +
+                        "to easily compare results");
+                    return;
+                }
+            }
+            catch (AmbiguousMatchException)
+            {
+                Debug.LogWarning($"Type: {returnType} has multiple definitions for CompareTo. " +
+                    "This is typically okay. Test function to make sure it works as intended");
+            }
+
             ShowElement(comparatorField);
 
             if (returnType == typeof(int))
@@ -348,13 +361,51 @@ public class ConditionManagerWindow : EditorWindow
             ShowElement(ORField);
             ShowElement(compareBtn);
             ShowElement(createConditionBtn);
+
         }
         else
         {
-            Debug.LogWarning($"{method.Name} returns void. Condition Function must return IComparable");
+            Debug.LogWarning($"{method.Name} returns void. Condition Function must Implement IComparable");
         }
     }
 
+    private void CreateCondition(ClickEvent evt)
+    {
+        Tuple<System.Object, MethodInfo> values = PreProcess();
+        Condition condition;
+
+        List<SerializableObjectWrapper> serializedParameters = new List<SerializableObjectWrapper>();
+        foreach (VisualElement parameter in paramContainer.Children())
+        {
+            serializedParameters.Add(new SerializableObjectWrapper(GetElementValue(parameter)));
+        }
+
+        SerializableObjectWrapper comparedValue = new SerializableObjectWrapper(GetElementValue(selectedArgument));
+        condition = new(values.Item1, values.Item2, serializedParameters.ToArray(), (ConditionComparator)comparatorField.value, comparedValue, ORField.value);
+
+        /*
+        if (selectedArgument is ObjectField)
+        {
+            // Evaluate param2 as an argument for the function
+            condition = new(values.Item1, values.Item2, (ConditionComparator)comparatorField.value, GetElementValue(selectedArgument), ORField.value, true);
+        }
+        else
+        {
+            // Evaluate (Instance.MethodInfo() lt/gt/eq Param2)
+            condition = new(values.Item1, values.Item2, (ConditionComparator)comparatorField.value, GetElementValue(selectedArgument), ORField.value, false);
+        }
+        */
+
+        //Debug.Log("Created Condition: " + condition);
+        // Add the new Condition to the list
+        if (ConditionManager != null)
+        {
+            SerializedProperty Conditions = ConditionManager.FindPropertyRelative("Conditions");
+            Conditions.InsertArrayElementAtIndex(Conditions.arraySize);
+            Conditions.GetArrayElementAtIndex(Conditions.arraySize - 1).boxedValue = condition;
+            ConditionManager.serializedObject.ApplyModifiedProperties();
+        }
+    }
 
     #region Utility
     /// <summary>
@@ -399,44 +450,6 @@ public class ConditionManagerWindow : EditorWindow
         }
 
         return new(callingObject, methodInfo);
-    }
-
-    private void CreateCondition(ClickEvent evt)
-    {
-        Tuple<System.Object, MethodInfo> values = PreProcess();
-        Condition condition;
-
-        List<SerializableObjectWrapper> serializedParameters = new List<SerializableObjectWrapper>();
-        foreach (VisualElement parameter in paramContainer.Children())
-        {
-            serializedParameters.Add(new SerializableObjectWrapper(GetElementValue(parameter)));
-        }
-
-        SerializableObjectWrapper comparedValue = new SerializableObjectWrapper(GetElementValue(selectedArgument));
-        condition = new(values.Item1, values.Item2, serializedParameters.ToArray(), (ConditionComparator)comparatorField.value, comparedValue, ORField.value);
-
-        /*
-        if (selectedArgument is ObjectField)
-        {
-            // Evaluate param2 as an argument for the function
-            condition = new(values.Item1, values.Item2, (ConditionComparator)comparatorField.value, GetElementValue(selectedArgument), ORField.value, true);
-        }
-        else
-        {
-            // Evaluate (Instance.MethodInfo() lt/gt/eq Param2)
-            condition = new(values.Item1, values.Item2, (ConditionComparator)comparatorField.value, GetElementValue(selectedArgument), ORField.value, false);
-        }
-        */
-
-        //Debug.Log("Created Condition: " + condition);
-        // Add the new Condition to the list
-        if (ConditionManager != null)
-        {
-            SerializedProperty Conditions = ConditionManager.FindPropertyRelative("Conditions");
-            Conditions.InsertArrayElementAtIndex(Conditions.arraySize);
-            Conditions.GetArrayElementAtIndex(Conditions.arraySize - 1).boxedValue = condition;
-            ConditionManager.serializedObject.ApplyModifiedProperties();
-        }
     }
 
     private void EvaluateCondition(ClickEvent evt)

@@ -8,14 +8,14 @@ namespace EZConditions
     public class EZConditionsSample1 : MonoBehaviour
     {
         [field : SerializeField]
-        [Condition(typeof(string))]
+        [Condition]
         public string Name {get; set;}
 
         public bool isDead;
 
         int level = 10;
 
-        [Condition(typeof(int))]
+        [Condition]
         public int Level {  get => level; private set => level = value; }
 
         public float DeathXP = 50.0f;
@@ -23,7 +23,7 @@ namespace EZConditions
         public Collider Collider;
 
 
-        [Condition(typeof(Collider))]
+        [Condition]
         public void VoidFunction()
         {
             Debug.Log($"{Name} called VoidFunction");
@@ -33,19 +33,19 @@ namespace EZConditions
         /// Function will not show up because it is private
         /// </summary>
         /// <returns></returns>
-        [Condition(typeof(int))]
+        [Condition]
         private int HiddenConditionFunction()
         {
             return 0;
         }
 
-        [Condition(typeof(Collider))]
+        [Condition]
         public bool HasCollider(Collider collider)
         {
             return this.Collider == collider;
         }
 
-        [Condition(typeof(float))]
+        [Condition]
         public float GetDeathXP()
         {
             return DeathXP;
