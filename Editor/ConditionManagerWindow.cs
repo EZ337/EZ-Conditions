@@ -285,23 +285,8 @@ public class ConditionManagerWindow : EditorWindow
         HideAllOptions();
         ShowElement(conditionField);
         // Show the appropriate field to compare to based on the method's return type
-        if (returnType != typeof(void))
+        if (returnType != typeof(void) && typeof(IComparable).IsAssignableFrom(returnType))
         {
-            try
-            {
-                if (returnType.GetMethod("CompareTo") == null)
-                {
-                    Debug.LogWarning($"Type: {returnType} Does not have a \"CompareTo\" function. Implenent the IComparable interface for this type" +
-                        "to easily compare results");
-                    return;
-                }
-            }
-            catch (AmbiguousMatchException)
-            {
-                Debug.LogWarning($"Type: {returnType} has multiple definitions for CompareTo. " +
-                    "This is typically okay. Test function to make sure it works as intended");
-            }
-
             ShowElement(comparatorField);
 
             if (returnType == typeof(int))
@@ -365,7 +350,7 @@ public class ConditionManagerWindow : EditorWindow
         }
         else
         {
-            Debug.LogWarning($"{method.Name} returns void. Condition Function must Implement IComparable");
+            Debug.LogWarning($"{returnType} does not implement IComparable. Condition Function's return type must Implement IComparable.");
         }
     }
 

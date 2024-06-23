@@ -52,7 +52,6 @@ namespace EZConditions
             }
             private set { function = value; }
         }
-
         public SerializableObjectWrapper ComparedValue { get => comparedValue; private set => comparedValue = value; }
 
         /// <summary>
