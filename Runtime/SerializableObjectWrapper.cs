@@ -12,9 +12,12 @@ namespace EZConditions
     {
         public string TypeName;
         public string JsonData;
-
         /// <summary>
-        /// This is assigned if the object is a unityObject otherwise, null
+        /// This is assigned if the object is a primitive data type. otherwise, null
+        /// </summary>
+        public string PrimitiveData;
+        /// <summary>
+        /// This is assigned if the object is a Unity Object, otherwise null.
         /// </summary>
         [SerializeField] private UnityEngine.Object UnityObject;
 
@@ -30,37 +33,55 @@ namespace EZConditions
             }
             else if (obj != null)
             {
-                TypeName = obj.GetType().AssemblyQualifiedName;
-                JsonData = JsonUtility.ToJson(obj);
+                Type type = obj.GetType();
+                TypeName = type.AssemblyQualifiedName;
+
+                if (type.IsPrimitive || obj is string || obj is decimal)
+                {
+                    // Serialize primitive types and strings directly as JSON data
+                    PrimitiveData = obj.ToString();
+                }
+                else
+                {
+                    JsonData = JsonUtility.ToJson(obj);
+                }
             }
         }
 
         /// <summary>
         /// The wrapped Object
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The deserialized object.</returns>
         public object GetObject()
         {
             if (UnityObject != null)
             {
                 return UnityObject;
             }
-            if (!string.IsNullOrEmpty(TypeName) && !string.IsNullOrEmpty(JsonData))
+
+            if (!string.IsNullOrEmpty(TypeName))
             {
                 Type type = Type.GetType(TypeName);
                 if (type != null)
                 {
-                    return JsonUtility.FromJson(JsonData, type);
+                    if (type.IsPrimitive || type == typeof(string) || type == typeof(decimal))
+                    {
+                        return Convert.ChangeType(PrimitiveData, type);
+                    }
+                    if (!string.IsNullOrEmpty(JsonData))
+                    {
+                        return JsonUtility.FromJson(JsonData, type);
+                    }
                 }
             }
+
             return null;
         }
 
         public override string ToString()
         {
-            return GetObject().ToString();
+            var obj = GetObject();
+            return obj != null ? obj.ToString() : "null";
         }
     }
-
 }
-
