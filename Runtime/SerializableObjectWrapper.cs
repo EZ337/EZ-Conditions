@@ -13,10 +13,6 @@ namespace EZConditions
         public string TypeName;
         public string JsonData;
         /// <summary>
-        /// This is assigned if the object is a primitive data type. otherwise, null
-        /// </summary>
-        public string PrimitiveData;
-        /// <summary>
         /// This is assigned if the object is a Unity Object, otherwise null.
         /// </summary>
         [SerializeField] private UnityEngine.Object UnityObject;
@@ -39,7 +35,7 @@ namespace EZConditions
                 if (type.IsPrimitive || obj is string || obj is decimal)
                 {
                     // Serialize primitive types and strings directly as JSON data
-                    PrimitiveData = obj.ToString();
+                    JsonData = obj.ToString();
                 }
                 else
                 {
@@ -66,7 +62,7 @@ namespace EZConditions
                 {
                     if (type.IsPrimitive || type == typeof(string) || type == typeof(decimal))
                     {
-                        return Convert.ChangeType(PrimitiveData, type);
+                        return Convert.ChangeType(JsonData, type);
                     }
                     if (!string.IsNullOrEmpty(JsonData))
                     {
