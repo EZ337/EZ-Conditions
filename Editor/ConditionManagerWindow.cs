@@ -159,12 +159,20 @@ public class ConditionManagerWindow : EditorWindow
     /// <param name="component">The object we are querying</param>
     private void PopulateConditions(UnityEngine.Object component)
     {
+        List<MemberInfo> members = new();
+
+        // If it's a script file, we only get public, static ConditionFunctions
+        if (component is MonoScript mono)
+        {
+            members = mono.GetClass().GetMembers(BindingFlags.Public | BindingFlags.Static)
+                .Where(member => member.GetCustomAttribute<ConditionAttribute>() != null).ToList();
+        }
+
         // Get only public methods and properties with ConditionAttribute
-        List<MemberInfo> members = component.GetType()
-            .GetMembers(BindingFlags.Instance | BindingFlags.Public)
-            .Where(member => (member is MethodInfo || member is PropertyInfo) &&
-                             member.GetCustomAttribute<ConditionAttribute>() != null)
-            .ToList();
+        members.AddRange(component.GetType().GetMembers(BindingFlags.Instance | BindingFlags.Public)
+            .Where(member => member.GetCustomAttribute<ConditionAttribute>() != null));
+
+
 
         // Put all valid methods into the methods list
         foreach (var member in members)
@@ -433,6 +441,10 @@ public class ConditionManagerWindow : EditorWindow
                 }
             }
         }
+        else if (callingObject is MonoScript ms)
+        {
+            callingObject = ms.GetClass();
+        }
 
         return new(new SerializableObjectWrapper(callingObject), methodInfo);
     }
@@ -530,6 +542,5 @@ public class ConditionManagerWindow : EditorWindow
         enumFlagsCompare.style.display = DisplayStyle.None;
         paramContainer.style.display = DisplayStyle.None;
     }
-
     #endregion
 }

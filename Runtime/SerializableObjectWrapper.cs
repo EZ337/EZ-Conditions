@@ -24,6 +24,19 @@ namespace EZConditions
         /// <param name="obj">Object to serialize</param>
         public SerializableObjectWrapper(object obj)
         {
+            // Copy constructor. Copy Constructor itself is probably redundant now
+            if (obj is SerializableObjectWrapper original)
+            {
+                if (original.GetObject() != null)
+                {
+                    TypeName = original.TypeName;
+                    JsonData = original.JsonData;
+                    cachedObject = original.cachedObject;
+                    UnityObject = original.UnityObject;
+                    return;
+                }
+            }
+            
             if (obj is UnityEngine.Object UEO)
             {
                 UnityObject = UEO;
@@ -38,12 +51,28 @@ namespace EZConditions
                     // Serialize primitive types and strings directly as JSON data
                     JsonData = obj.ToString();
                 }
+                else if (obj is Type tp)
+                {
+                    TypeName = typeof(System.Type).AssemblyQualifiedName;
+                    JsonData = tp.AssemblyQualifiedName;
+                }
                 else
                 {
                     JsonData = JsonUtility.ToJson(obj);
                 }
             }
             cachedObject = obj;
+        }
+
+        public SerializableObjectWrapper(SerializableObjectWrapper original)
+        {
+            if (original.GetObject() != null)
+            {
+                TypeName = original.TypeName;
+                JsonData = original.JsonData;
+                cachedObject = original.cachedObject;
+                UnityObject = original.UnityObject;
+            }
         }
 
         /// <summary>
@@ -71,6 +100,10 @@ namespace EZConditions
                     if (type.IsPrimitive || type == typeof(string) || type == typeof(decimal))
                     {
                         cachedObject = Convert.ChangeType(JsonData, type);
+                    }
+                    else if (type == typeof(System.Type))
+                    {
+                        cachedObject = Type.GetType(JsonData);
                     }
                     else
                     {

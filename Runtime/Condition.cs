@@ -41,7 +41,17 @@ namespace EZConditions
                 {
                     if (MethodName == null)
                         Debug.LogError("MethodName was null for some reason. Let EZ Know");
-                    function = Obj.GetType().GetMethod(MethodName);
+
+                    // Static support
+                    if (obj.GetObject() is Type tp)
+                    {
+                        function = tp.GetMethod(methodName);
+                    }
+                    else
+                    {
+                        function = Obj.GetType().GetMethod(MethodName);
+                    }
+
                 }
                 if (function == null)
                 {
@@ -61,17 +71,21 @@ namespace EZConditions
         {
             get
             {
-                if (Obj != null && Function != null && !string.IsNullOrEmpty(MethodName))
+                if (Function != null)
                 {
-                    int i = 0;
-                    foreach (ParameterInfo paramInfo in Function.GetParameters())
+                    if (Obj != null || Function.IsStatic)
                     {
-                        if (paramInfo.ParameterType != Parameters[i++].GetType())
-                            return false;
-                    }
+                        int i = 0;
+                        foreach (ParameterInfo paramInfo in Function.GetParameters())
+                        {
+                            if (paramInfo.ParameterType != Parameters[i++].GetType())
+                                return false;
+                        }
 
-                    return true;
+                        return true;
+                    }
                 }
+
 
                 return false;
             }
