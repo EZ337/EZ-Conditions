@@ -18,6 +18,7 @@ namespace EZConditions
         /// <param name="minInclusive">Minimum number to consider</param>
         /// <param name="maxInclusive">Maximum number to consider</param>
         /// <returns>Random valuue between min (inclusive) and max (inclusive)</returns>
+        [Condition]
         public static float GetRandomFloat(float minInclusive, float maxInclusive)
         {
             return UnityEngine.Random.Range(minInclusive, maxInclusive);
