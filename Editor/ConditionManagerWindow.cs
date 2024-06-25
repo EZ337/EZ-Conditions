@@ -356,7 +356,7 @@ public class ConditionManagerWindow : EditorWindow
 
     private void CreateCondition(ClickEvent evt)
     {
-        Tuple<System.Object, MethodInfo> values = PreProcess();
+        Tuple<SerializableObjectWrapper, MethodInfo> values = PreProcess();
         Condition condition;
 
         List<SerializableObjectWrapper> serializedParameters = new List<SerializableObjectWrapper>();
@@ -405,7 +405,7 @@ public class ConditionManagerWindow : EditorWindow
         conditionField.SetValueWithoutNotify("No Function");
     }
 
-    private Tuple<System.Object, MethodInfo> PreProcess()
+    private Tuple<SerializableObjectWrapper, MethodInfo> PreProcess()
     {
         // Convert the selected method into a MethodInfo
         MethodInfo methodInfo;
@@ -434,7 +434,7 @@ public class ConditionManagerWindow : EditorWindow
             }
         }
 
-        return new(callingObject, methodInfo);
+        return new(new SerializableObjectWrapper(callingObject), methodInfo);
     }
 
     private void EvaluateCondition(ClickEvent evt)

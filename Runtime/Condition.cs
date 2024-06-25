@@ -11,7 +11,7 @@ namespace EZConditions
     public class Condition
     {
         #region Fields
-        [SerializeField] private UnityEngine.Object obj;
+        [SerializeField] private SerializableObjectWrapper obj;
         [SerializeField] private ConditionComparator comparator;
         [SerializeField] private bool or = false;
         [SerializeField] private string methodName;
@@ -23,7 +23,7 @@ namespace EZConditions
         #endregion
 
         #region Properties
-        public UnityEngine.Object Obj { get => obj; private set => obj = value; }
+        public System.Object Obj { get => obj.GetObject(); private set => obj = new SerializableObjectWrapper(value); }
         public ConditionComparator Comparator { get => comparator; private set => comparator = value; }
         public bool OR { get => or; private set => or = value; } // Whether this condition treated as AND or OR
 
@@ -52,7 +52,7 @@ namespace EZConditions
             }
             private set { function = value; }
         }
-        public SerializableObjectWrapper ComparedValue { get => comparedValue; private set => comparedValue = value; }
+        public System.Object ComparedValue { get => comparedValue.GetObject(); private set => comparedValue = new SerializableObjectWrapper(value); }
 
         /// <summary>
         /// If this condition is a valid condition. i.e. There wouldn't be any problems using it
@@ -83,11 +83,11 @@ namespace EZConditions
         public SerializableObjectWrapper[] Parameters { get => parameters; set => parameters = value; }
         #endregion
 
-        public Condition(System.Object obj, MethodInfo function, SerializableObjectWrapper[] args, 
+        public Condition(SerializableObjectWrapper obj, MethodInfo function, SerializableObjectWrapper[] args, 
             ConditionComparator comparator, SerializableObjectWrapper comparedValue, bool OR)
         {
             // Could be null for static methods?
-            Obj = obj as UnityEngine.Object;
+            Obj = obj;
             Function = function;
             MethodName = function.Name;
             Parameters = args;
@@ -98,7 +98,7 @@ namespace EZConditions
 
         public bool EvaluateCondition()
         {
-            return Evaluate(Obj, Function, Parameters, Comparator, ComparedValue.GetObject());
+            return Evaluate(Obj, Function, Parameters, Comparator, ComparedValue);
         }
 
         /// <summary>
@@ -108,61 +108,42 @@ namespace EZConditions
         /// It's also the subject of the condition</param>
         /// <param name="function">Condition predicate. The question being asked. Method with the [Condition] attribute</param>
         /// <param name="comparator">The comparison operator to check foro</param>
-        /// <param name="param2">The other object to compare against</param>
+        /// <param name="comparedValue">The other object to compare against</param>
         /// <returns>A valid comparison of true or false. False if unable to compare the two objects</returns>
-        public bool Evaluate(System.Object obj, MethodInfo function, SerializableObjectWrapper[] argsList, ConditionComparator comparator, System.Object param2)
+        public bool Evaluate(System.Object obj, MethodInfo function, SerializableObjectWrapper[] argsList, ConditionComparator comparator, System.Object comparedValue)
         {
-            try
+            // Construct Args
+            List<System.Object> arguments = new List<System.Object>();
+            foreach (var item in argsList)
             {
-                List<System.Object> arguments = new List<System.Object>();
-                foreach (var item in argsList)
-                {
-                   arguments.Add(item.GetObject()); 
-                }
-
-                // All functions should not take args
-                System.Object ret = function.Invoke(obj, arguments.ToArray()); // Call the function
-
-                // Can we compare the two objects against each other? (It's a loose definition here)
-                if (ret is IComparable comparableRet && param2 is IComparable comparableParam2)
-                {
-                    return Compare(comparableRet.CompareTo(comparableParam2), comparator);
-                }
-
-                Debug.LogWarning($"{this}: Cannot compare {obj} and {(param2 ?? "Null")}.");
-            }
-            catch
-            {
-                Debug.LogWarning($"{this} Evaluation crashed. This is a noteworthy issue. Please debug and share info with EZ.");
-                //Debug.LogException(e);
-                // We crash if this is build. Otherwise, we return false in editor mode
-#if !UNITY_EDITOR
-                    throw;
-#endif
+                arguments.Add(item.GetObject()); 
             }
 
-            return false;
+            IComparable ret = function.Invoke(obj, arguments.ToArray()) as IComparable; // Call the function
+
+            /* Technically redundant now. I'm going to allow it to crash. If it does crash, we know we really messed up
+            if (ret is IComparable comparableRet && param2 is IComparable comparableParam2)
+            {
+                return Compare(comparableRet.CompareTo(comparableParam2), comparator);
+            }*/
+            return Compare(ret.CompareTo(comparedValue as IComparable), comparator);
+
+            //Debug.LogWarning($"{this}: Cannot compare {obj} and {(param2 ?? "Null")}.");
+
         }
 
         private bool Compare(int comparison, ConditionComparator comparator)
         {
-            switch (comparator)
+            return comparator switch
             {
-                case ConditionComparator.EqualTo:
-                    return comparison == 0;
-                case ConditionComparator.NotEqualTo:
-                    return comparison != 0;
-                case ConditionComparator.GreaterThan:
-                    return comparison > 0;
-                case ConditionComparator.GreaterThanOrEqual:
-                    return comparison >= 0;
-                case ConditionComparator.LessThan:
-                    return comparison < 0;
-                case ConditionComparator.LessThanOrEqual:
-                    return comparison <= 0;
-            }
-
-            return false;
+                ConditionComparator.EqualTo => comparison == 0,
+                ConditionComparator.NotEqualTo => comparison != 0,
+                ConditionComparator.GreaterThan => comparison > 0,
+                ConditionComparator.GreaterThanOrEqual => comparison >= 0,
+                ConditionComparator.LessThan => comparison < 0,
+                ConditionComparator.LessThanOrEqual => comparison <= 0,
+                _ => false,
+            };
         }
 
         #region Utility
