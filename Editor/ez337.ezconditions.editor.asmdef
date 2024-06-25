@@ -1,6 +1,6 @@
 {
     "name": "ez337.ezconditions.editor",
-    "rootNamespace": "",
+    "rootNamespace": "EZConditions",
     "references": [
         "GUID:629c04c208ba5be479480efe72dbdf84"
     ],
