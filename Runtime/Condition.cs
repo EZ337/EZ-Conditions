@@ -40,7 +40,7 @@ namespace EZConditions
                 if (function == null)
                 {
                     if (MethodName == null)
-                        Debug.LogError("MethodName was null for some reason. Let EZ Know");
+                        ConditionUtility.LogError("Condition: MethodName was null");
 
                     // Static support
                     if (obj.GetObject() is Type tp)
@@ -55,7 +55,10 @@ namespace EZConditions
                 }
                 if (function == null)
                 {
-                    Debug.LogError("Critical Error. Was unable to fetch condition function.\nCreating Conditions with the \"+\" button is unsupported. If that's not your issue, Let EZ Know");
+                    ConditionUtility.LogError("Condition: Critical Error. Was unable to fetch condition function.");
+#if UNITY_EDITOR
+                    Debug.LogError("Creating Conditions with the \"+\" button is unsupported. If that's not your issue, Let EZ Know");
+#endif
                 }
 
                 return function;
