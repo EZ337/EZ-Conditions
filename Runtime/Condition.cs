@@ -97,8 +97,17 @@ namespace EZConditions
         public SerializableObjectWrapper[] Parameters { get => parameters; set => parameters = value; }
         #endregion
 
-        public Condition(SerializableObjectWrapper obj, MethodInfo function, SerializableObjectWrapper[] args, 
-            ConditionComparator comparator, SerializableObjectWrapper comparedValue, bool OR)
+        /// <summary>
+        /// Creates a condition
+        /// </summary>
+        /// <param name="obj">Do NOT Wrap obj in SerializableObjectWrapper. It is done in the Condition</param>
+        /// <param name="function">Function call</param>
+        /// <param name="args">Parameters wrapped in SerializableObjectWrapper</param>
+        /// <param name="comparator"></param>
+        /// <param name="comparedValue"><b>Do NOT Wrap</b> compared value in SerializableObjectWrapper</param>
+        /// <param name="OR">True means condition is OR. False means condition is AND</param>
+        public Condition(System.Object obj, MethodInfo function, SerializableObjectWrapper[] args, 
+            ConditionComparator comparator, System.Object comparedValue, bool OR)
         {
             // Could be null for static methods?
             Obj = obj;
@@ -124,7 +133,7 @@ namespace EZConditions
         /// <param name="comparator">The comparison operator to check foro</param>
         /// <param name="comparedValue">The other object to compare against</param>
         /// <returns>A valid comparison of true or false. False if unable to compare the two objects</returns>
-        public bool Evaluate(System.Object obj, MethodInfo function, SerializableObjectWrapper[] argsList, ConditionComparator comparator, System.Object comparedValue)
+        public static bool Evaluate(System.Object obj, MethodInfo function, SerializableObjectWrapper[] argsList, ConditionComparator comparator, System.Object comparedValue)
         {
             // Construct Args
             List<System.Object> arguments = new List<System.Object>();
@@ -146,7 +155,7 @@ namespace EZConditions
 
         }
 
-        private bool Compare(int comparison, ConditionComparator comparator)
+        private static bool Compare(int comparison, ConditionComparator comparator)
         {
             return comparator switch
             {

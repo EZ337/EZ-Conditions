@@ -24,19 +24,6 @@ namespace EZConditions
         /// <param name="obj">Object to serialize</param>
         public SerializableObjectWrapper(object obj)
         {
-            // Copy constructor. Copy Constructor itself is probably redundant now
-            if (obj is SerializableObjectWrapper original)
-            {
-                if (original.GetObject() != null)
-                {
-                    TypeName = original.TypeName;
-                    JsonData = original.JsonData;
-                    cachedObject = original.cachedObject;
-                    UnityObject = original.UnityObject;
-                    return;
-                }
-            }
-            
             if (obj is UnityEngine.Object UEO)
             {
                 UnityObject = UEO;

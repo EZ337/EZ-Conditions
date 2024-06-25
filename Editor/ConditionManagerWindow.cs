@@ -364,7 +364,7 @@ public class ConditionManagerWindow : EditorWindow
 
     private void CreateCondition(ClickEvent evt)
     {
-        Tuple<SerializableObjectWrapper, MethodInfo> values = PreProcess();
+        Tuple<System.Object, MethodInfo> values = PreProcess();
         Condition condition;
 
         List<SerializableObjectWrapper> serializedParameters = new List<SerializableObjectWrapper>();
@@ -373,8 +373,8 @@ public class ConditionManagerWindow : EditorWindow
             serializedParameters.Add(new SerializableObjectWrapper(GetElementValue(parameter)));
         }
 
-        SerializableObjectWrapper comparedValue = new SerializableObjectWrapper(GetElementValue(selectedArgument));
-        condition = new(values.Item1, values.Item2, serializedParameters.ToArray(), (ConditionComparator)comparatorField.value, comparedValue, ORField.value);
+        condition = new(values.Item1, values.Item2, serializedParameters.ToArray(), (ConditionComparator)comparatorField.value, 
+            GetElementValue(selectedArgument), ORField.value);
 
         /*
         if (selectedArgument is ObjectField)
@@ -413,7 +413,7 @@ public class ConditionManagerWindow : EditorWindow
         conditionField.SetValueWithoutNotify("No Function");
     }
 
-    private Tuple<SerializableObjectWrapper, MethodInfo> PreProcess()
+    private Tuple<System.Object, MethodInfo> PreProcess()
     {
         // Convert the selected method into a MethodInfo
         MethodInfo methodInfo;
@@ -446,7 +446,7 @@ public class ConditionManagerWindow : EditorWindow
             callingObject = ms.GetClass();
         }
 
-        return new(new SerializableObjectWrapper(callingObject), methodInfo);
+        return new(callingObject, methodInfo);
     }
 
     private void EvaluateCondition(ClickEvent evt)
