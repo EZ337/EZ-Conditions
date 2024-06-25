@@ -16,6 +16,7 @@ namespace EZConditions
         /// This is assigned if the object is a Unity Object, otherwise null.
         /// </summary>
         [SerializeField] private UnityEngine.Object UnityObject;
+        public System.Object cachedObject;
 
         /// <summary>
         /// Serialized version of obj
@@ -42,6 +43,7 @@ namespace EZConditions
                     JsonData = JsonUtility.ToJson(obj);
                 }
             }
+            cachedObject = obj;
         }
 
         /// <summary>
@@ -50,28 +52,34 @@ namespace EZConditions
         /// <returns>The deserialized object.</returns>
         public object GetObject()
         {
+
             if (UnityObject != null)
             {
                 return UnityObject;
             }
 
+            if (cachedObject != null)
+            {
+                return cachedObject;
+            }
+
             if (!string.IsNullOrEmpty(TypeName))
             {
                 Type type = Type.GetType(TypeName);
-                if (type != null)
+                if (type != null && !string.IsNullOrEmpty(JsonData))
                 {
                     if (type.IsPrimitive || type == typeof(string) || type == typeof(decimal))
                     {
-                        return Convert.ChangeType(JsonData, type);
+                        cachedObject = Convert.ChangeType(JsonData, type);
                     }
-                    if (!string.IsNullOrEmpty(JsonData))
+                    else
                     {
-                        return JsonUtility.FromJson(JsonData, type);
+                        cachedObject = JsonUtility.FromJson(JsonData, type);
                     }
                 }
             }
 
-            return null;
+            return cachedObject;
         }
 
         public override string ToString()
