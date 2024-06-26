@@ -14,6 +14,11 @@ namespace EZConditions
 
         public List<Condition> Conditions = new List<Condition>();
 
+        /// <summary>
+        /// Evaluates the set of conditions belonging to this manager. Pass in true to receive Debug info
+        /// </summary>
+        /// <param name="debug">true for debug info</param>
+        /// <returns></returns>
         public bool EvaluateConditions(bool debug = false)
         {
             bool totalLogic = true;
@@ -43,7 +48,7 @@ namespace EZConditions
 
                         if (debug)
                         {
-                            Debug.Log($"OR Condition: {condition} evaluated to {currentResult}. Current OR Group Result: {orGroupResult}");
+                            ConditionUtility.Log($"OR Condition: {condition} evaluated to {currentResult}. Current OR Group Result: {orGroupResult}");
                         }
 
                         // If it's the last condition in our list, finalize the OR group evaluation
@@ -67,7 +72,7 @@ namespace EZConditions
                             totalLogic = currentResult;
                             if (debug)
                             {
-                                Debug.Log($"{condition} is False.");
+                                ConditionUtility.Log($"{condition} is False.");
                             }
                         }
                     }
@@ -76,8 +81,8 @@ namespace EZConditions
             }
             catch (System.Exception e)
             {
-                Debug.LogWarning("Condition Manager crashed. This is a noteworthy issue. Please try and debug and report to EZ with information. Returning false...");
-                Debug.LogException(e);
+                ConditionUtility.LogWarning("Condition Manager crashed. This is a noteworthy issue. Please try and debug and report to EZ with information.");
+                ConditionUtility.LogException(e);
 
                 // We crash if this is build. Otherwise, we return false in editor mode
 #if !UNITY_EDITOR
@@ -89,17 +94,18 @@ namespace EZConditions
 
             if (debug)
             {
-                Debug.Log("Coalesced Conditions: " + totalLogic);
+                ConditionUtility.Log("ConditionManager Coalasced: " + totalLogic);
             }
             return totalLogic;
         }
 
 
+#if UNITY_EDITOR
         /// <summary>
         /// Important because of the nonSerializable information in Condition, we should invalidate
         /// the non-serializable field so that they are reconstructed as needed
         /// </summary>
-        private void OnValidate()
+        public void OnValidate()
         {
             List<Condition> ToRemove = new List<Condition>();
             foreach (Condition condition in Conditions)
@@ -124,5 +130,6 @@ namespace EZConditions
             }
         }
     }
+#endif
 }
 

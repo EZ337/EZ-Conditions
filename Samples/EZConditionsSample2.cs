@@ -63,7 +63,7 @@ namespace EZConditions
         }
 
 
-        [Condition(typeof(float))]
+        [Condition]
         public float GetInventoryRatio()
         {
             return (float)Math.Round(inventoryWeight / maxWeight, 3);
@@ -73,25 +73,25 @@ namespace EZConditions
         /// Private Conditions show in the condition manager (This was a design choice. Input appreciated)
         /// </summary>
         /// <returns></returns>
-        [Condition(typeof(float))]
+        [Condition]
         private float GetTimesDefeated()
         {
             return timesDefeated;
         }
 
-        [Condition(typeof(bool))]
+        [Condition]
         public bool InDialogue()
         {
             return inDialogue;
         }
 
-        [Condition(typeof(Condition2EnumTest))]
+        [Condition]
         public Condition2EnumTest GetEnum1()
         {
             return enumTest;
         }
 
-        [Condition(typeof(Condition2EnumTest2))]
+        [Condition]
         public Condition2EnumTest2 GetEnum2()
         {
             return enumTest2;
