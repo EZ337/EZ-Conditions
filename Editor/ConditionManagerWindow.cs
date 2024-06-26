@@ -120,6 +120,9 @@ public class ConditionManagerWindow : EditorWindow
         param1Field.RegisterValueChangedCallback(OnObjectChange);
         conditionField.RegisterValueChangedCallback(OnConditionFunctionChange);
 
+        // Plops the ConditionUtility in the field
+        param1Field.value = AssetDatabase.LoadAssetAtPath<MonoScript>("Packages/com.ez337.ezconditions/Runtime/ConditionUtility.cs");
+
         HideAllOptions();
         ShowElement(param1Field);
 
