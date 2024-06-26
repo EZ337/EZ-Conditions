@@ -8,6 +8,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Linq;
+using static PlasticGui.Configuration.OAuth.GetOauthProviders.AuthInfo;
 
 public class ConditionManagerWindow : EditorWindow
 {
@@ -18,6 +19,7 @@ public class ConditionManagerWindow : EditorWindow
     public DropdownField conditionField;
     public EnumField comparatorField;
     public EnumField enumCompare;
+    public EnumFlagsField enumFlagsCompare;
     public ObjectField param1Field;
     public IntegerField intCompare;
     public FloatField floatCompare;
@@ -27,6 +29,7 @@ public class ConditionManagerWindow : EditorWindow
     public Toggle ORField;
     public Button compareBtn;
     public Button createConditionBtn;
+    public VisualElement paramContainer;
 
     private List<MemberInfo> methods = new List<MemberInfo>();
     private MemberInfo selectedMethod;
@@ -36,16 +39,15 @@ public class ConditionManagerWindow : EditorWindow
     public static void ShowWindow(SerializedProperty conditionmanager)
     {
         ConditionManager = conditionmanager;
+        // Check validity of conditionManager cause why not
+        ((ConditionManager)ConditionManager.boxedValue).OnValidate();
         ConditionManagerWindow wnd = GetWindow<ConditionManagerWindow>();
         wnd.titleContent = new GUIContent($"{ConditionManager.serializedObject.targetObject} - Condition Manager");
     }
 
     private void OnDisable()
     {
-        if (ConditionManager != null)
-        {
-            ConditionManager.Dispose();
-        }
+        ConditionManager?.Dispose();
     }
 
     public void CreateGUI()
@@ -71,7 +73,7 @@ public class ConditionManagerWindow : EditorWindow
         }
         else
         {
-            Debug.Log("No Valid ConditionManager");
+            //Debug.Log("No Valid ConditionManager");
             this.Close();
         }
 
@@ -79,12 +81,29 @@ public class ConditionManagerWindow : EditorWindow
         conditionField = root.Q<DropdownField>("cond-func");
         comparatorField = root.Q<EnumField>("comparator");
         enumCompare = root.Q<EnumField>("enum-compare");
+        enumFlagsCompare = root.Q<EnumFlagsField>("enumFlags-compare");
         intCompare = root.Q<IntegerField>("int-compare");
         floatCompare = root.Q<FloatField>("float-compare");
         stringCompare = root.Q<TextField>("string-compare");
         boolCompare = root.Q<Toggle>("bool-compare");
         param2Field = root.Q<ObjectField>("param2");
         ORField = root.Q<Toggle>("OR");
+        paramContainer = rootVisualElement.Q<VisualElement>("param-fields");
+
+        // Disable Scene objects if the item is an asset
+        try
+        {
+            if (AssetDatabase.Contains(ConditionManagerWindow.ConditionManager.serializedObject.targetObject))
+            {
+                param1Field.allowSceneObjects = false;
+                param2Field.allowSceneObjects = false;
+            }
+        }
+        catch
+        {
+            this.Close();
+        }
+
 
         if (AssetDatabase.Contains(ConditionManagerWindow.ConditionManager.serializedObject.targetObject))
         {
@@ -93,7 +112,7 @@ public class ConditionManagerWindow : EditorWindow
         }
 
         compareBtn = root.Q<Button>("evaluateCondition");
-        compareBtn.RegisterCallback<ClickEvent>(EvaluateCondition);
+        compareBtn.RegisterCallback<ClickEvent>(TestConditionManager);
 
         createConditionBtn = root.Q<Button>("createCondition");
         createConditionBtn.RegisterCallback<ClickEvent>(CreateCondition);
@@ -103,49 +122,6 @@ public class ConditionManagerWindow : EditorWindow
 
         HideAllOptions();
         ShowElement(param1Field);
-
-    }
-
-
-    /// <summary>
-    /// Gets all valid MethodInfo and PropertyInfos that are public, private, or protected
-    /// AND have the [Condition] attribute on them
-    /// </summary>
-    /// <param name="component">The object we are querying</param>
-    private void PopulateConditions(UnityEngine.Object component)
-    {
-        // Get only public methods and properties with ConditionAttribute
-        List<MemberInfo> members = component.GetType()
-            .GetMembers(BindingFlags.Instance | BindingFlags.Public)
-            .Where(member => (member is MethodInfo || member is PropertyInfo) &&
-                             member.GetCustomAttribute<ConditionAttribute>() != null)
-            .ToList();
-
-        // Put all valid methods into the methods list
-        foreach (var member in members)
-        {
-            // Disabled to just keep property and methods together.
-            /*
-            MethodInfo methodInfo = member as MethodInfo;
-            //Debug.Log("MethodInfo: " + methodInfo);
-            if (member is PropertyInfo property)
-            {
-                // Properties are converted to methodInfo
-                methodInfo = ((PropertyInfo)member).GetMethod;
-
-                //Debug.Log("Property with ConditionAttribute: " + property.Name);
-                //Debug.Log("Property as Method: " + methodInfo);
-            }
-
-            else if (member is MethodInfo method)
-            {
-                Debug.Log("Method with ConditionAttribute: " + method.Name);
-            }
-            */
-
-            conditionField.choices.Add(component.GetType() + "/" + member.Name);
-            methods.Add(member);
-        }
 
     }
 
@@ -185,6 +161,56 @@ public class ConditionManagerWindow : EditorWindow
     }
 
     /// <summary>
+    /// Gets all valid MethodInfo and PropertyInfos that are public
+    /// AND have the [Condition] attribute on them
+    /// </summary>
+    /// <param name="component">The object we are querying</param>
+    private void PopulateConditions(UnityEngine.Object component)
+    {
+        List<MemberInfo> members = new();
+
+        // If it's a script file, we only get public, static ConditionFunctions
+        if (component is MonoScript mono)
+        {
+            members = mono.GetClass().GetMembers(BindingFlags.Public | BindingFlags.Static)
+                .Where(member => member.GetCustomAttribute<ConditionAttribute>() != null).ToList();
+        }
+
+        // Get only public methods and properties with ConditionAttribute
+        members.AddRange(component.GetType().GetMembers(BindingFlags.Instance | BindingFlags.Public)
+            .Where(member => member.GetCustomAttribute<ConditionAttribute>() != null));
+
+
+
+        // Put all valid methods into the methods list
+        foreach (var member in members)
+        {
+            // Disabled to just keep property and methods together.
+            /*
+            MethodInfo methodInfo = member as MethodInfo;
+            //Debug.Log("MethodInfo: " + methodInfo);
+            if (member is PropertyInfo property)
+            {
+                // Properties are converted to methodInfo
+                methodInfo = ((PropertyInfo)member).GetMethod;
+
+                //Debug.Log("Property with ConditionAttribute: " + property.Name);
+                //Debug.Log("Property as Method: " + methodInfo);
+            }
+
+            else if (member is MethodInfo method)
+            {
+                Debug.Log("Method with ConditionAttribute: " + method.Name);
+            }
+            */
+
+            conditionField.choices.Add(component.GetType() + "/" + member.Name);
+            methods.Add(member);
+        }
+
+    }
+
+    /// <summary>
     /// Event called when we pick something in the dropdown
     /// </summary>
     /// <param name="evt"></param>
@@ -198,52 +224,124 @@ public class ConditionManagerWindow : EditorWindow
         //Debug.Log("MethodInfo at index is " + methods[index]);
         conditionField.SetValueWithoutNotify(evt.newValue.Replace('/', '.'));
 
-        SetUpConditionWindow(selectedMethod);
+        PresentParameters(selectedMethod);
+        ShowElement(paramContainer);
     }
 
-    private void SetUpConditionWindow(MemberInfo method)
+    private void PresentParameters(MemberInfo method)
     {
-        ConditionAttribute attr = method.GetCustomAttribute<ConditionAttribute>();
-        // NOTE: Room to deal with Param1 as well. For now, param1 is neglected.
-        // In future, param1 could potentially support condition checking for methods that do not
-        // belong to the calling class... Idk if we should support that. But just in case.
+        paramContainer.Clear();
+        MethodInfo methodInfo = (method is PropertyInfo property) ? property.GetGetMethod(true) : (MethodInfo)method;
 
-        Type attrType = attr.Param2;
+        // Show a parameter field for each parameter on this method
+        foreach ( ParameterInfo parameter in methodInfo.GetParameters() )
+        {
+            Type type = parameter.ParameterType;
+            VisualElement parameterField;
+            if (type == typeof(int))
+            {
+                parameterField = new IntegerField($"{parameter.Name} (int)");
+            }
+            else if (type == typeof(float))
+            {
+                parameterField = new FloatField($"{parameter.Name} (float)");
+            }
+            else if (type == typeof(string))
+            {
+                parameterField = new TextField($"{parameter.Name} (string)");
+            }
+            else if (type == typeof(bool))
+            {
+                parameterField = new Toggle($"{parameter.Name} (bool)");
+            }
+            else if (type.IsEnum)
+            {
+                System.Enum enumType = (System.Enum)type.GetEnumValues().GetValue(0);
+
+                // Enum Flags
+                if (type.GetCustomAttribute<FlagsAttribute>(true) != null)
+                {
+                    parameterField = new EnumFlagsField($"{parameter.Name}", enumType);
+                }
+                else // Regular Enum
+                {
+                    parameterField = new EnumField($"{parameter.Name}", enumType);
+                }
+            }
+            else
+            {
+                parameterField = new ObjectField($"{parameter.Name}");
+                try
+                {
+                    ((ObjectField)parameterField).objectType = type;
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning("Unable to properly accept type {type}");
+                    Debug.LogError(ex);
+                }
+            }
+
+            paramContainer.Add(parameterField);
+        }
+
+        // 
+        SetUpConditionWindow(methodInfo);
+    }
+
+    /// <summary>
+    /// Final creation process. Presents comparison field and create condition button
+    /// </summary>
+    /// <param name="method"></param>
+    private void SetUpConditionWindow(MethodInfo method)
+    {
+
+        Type returnType = method.ReturnType;
 
         HideAllOptions();
         ShowElement(conditionField);
-        // Show the appropriate param2 field
-        if (attrType != null)
+        // Show the appropriate field to compare to based on the method's return type
+        if (returnType != typeof(void) && typeof(IComparable).IsAssignableFrom(returnType))
         {
             ShowElement(comparatorField);
 
-            if (attrType == typeof(int))
+            if (returnType == typeof(int))
             {
                 ShowElement(intCompare);
                 selectedArgument = intCompare;
             }
-            else if (attrType == typeof(float))
+            else if (returnType == typeof(float))
             {
                 ShowElement(floatCompare);
                 selectedArgument = floatCompare;
             }
-            else if (attrType == typeof(string))
+            else if (returnType == typeof(string))
             {
                 ShowElement(stringCompare);
                 selectedArgument = stringCompare;
             }
-            else if (attrType == typeof(bool))
+            else if (returnType == typeof(bool))
             {
                 ShowElement(boolCompare);
                 selectedArgument = boolCompare;
             }
-            else if (attrType.IsEnum)
+            else if (returnType.IsEnum)
             {
-                ShowElement(enumCompare);
-                selectedArgument = enumCompare;
-                // Get the type of the enum
-                System.Enum enumType = (System.Enum)attrType.GetEnumValues().GetValue(0);
-                enumCompare.Init(enumType);
+                System.Enum enumType = (System.Enum)returnType.GetEnumValues().GetValue(0);
+
+                // Enum Flags
+                if (returnType.GetCustomAttribute<FlagsAttribute>(true) != null)
+                {
+                    ShowElement(enumFlagsCompare);
+                    selectedArgument = enumFlagsCompare;
+                    enumFlagsCompare.Init(enumType);
+                }
+                else // Regular Enum
+                {
+                    ShowElement(enumCompare);
+                    selectedArgument = enumCompare;
+                    enumCompare.Init(enumType);
+                }
             }
             else
             {
@@ -251,22 +349,74 @@ public class ConditionManagerWindow : EditorWindow
                 HideElement(comparatorField);
                 try
                 {
-                    param2Field.objectType = attrType;
+                    param2Field.objectType = returnType;
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning($"Unable to properly accept type {attrType}. Verify or Let EZ Know");
+                    Debug.LogWarning($"Unable to properly accept type {returnType}. Verify or Let EZ Know");
                     Debug.LogError(ex);
                 }
                 selectedArgument = param2Field;
             }
-        }
 
-        ShowElement(ORField);
-        ShowElement(compareBtn);
-        ShowElement(createConditionBtn);
+            ShowElement(ORField);
+            ShowElement(compareBtn);
+            ShowElement(createConditionBtn);
+
+        }
+        else
+        {
+            Debug.LogWarning($"{returnType} does not implement IComparable. Condition Function's return type must Implement IComparable.");
+        }
     }
 
+    private void CreateCondition(ClickEvent evt)
+    {
+        Tuple<System.Object, MethodInfo> values = PreProcess();
+        Condition condition;
+
+        List<SerializableObjectWrapper> serializedParameters = new List<SerializableObjectWrapper>();
+        foreach (VisualElement parameter in paramContainer.Children())
+        {
+            serializedParameters.Add(new SerializableObjectWrapper(GetElementValue(parameter)));
+        }
+
+        condition = new(values.Item1, values.Item2, serializedParameters.ToArray(), (ConditionComparator)comparatorField.value, 
+            GetElementValue(selectedArgument), ORField.value);
+
+        /*
+        if (selectedArgument is ObjectField)
+        {
+            // Evaluate param2 as an argument for the function
+            condition = new(values.Item1, values.Item2, (ConditionComparator)comparatorField.value, GetElementValue(selectedArgument), ORField.value, true);
+        }
+        else
+        {
+            // Evaluate (Instance.MethodInfo() lt/gt/eq Param2)
+            condition = new(values.Item1, values.Item2, (ConditionComparator)comparatorField.value, GetElementValue(selectedArgument), ORField.value, false);
+        }
+        */
+
+        //Debug.Log("Created Condition: " + condition);
+        // Add the new Condition to the list
+        if (condition.IsValid)
+        {
+            if (ConditionManager != null)
+            {
+                // Extra check on the validity of this Manager. Cause why not
+                ((ConditionManager)ConditionManager.boxedValue).OnValidate();
+                SerializedProperty Conditions = ConditionManager.FindPropertyRelative("Conditions");
+                Conditions.InsertArrayElementAtIndex(Conditions.arraySize);
+                Conditions.GetArrayElementAtIndex(Conditions.arraySize - 1).boxedValue = condition;
+                ConditionManager.serializedObject.ApplyModifiedProperties();
+            }
+        }
+        else
+        {
+            Debug.Log("Created Condition was invalid");
+        }
+
+    }
 
     #region Utility
     /// <summary>
@@ -309,61 +459,22 @@ public class ConditionManagerWindow : EditorWindow
                 }
             }
         }
+        else if (callingObject is MonoScript ms)
+        {
+            callingObject = ms.GetClass();
+        }
 
         return new(callingObject, methodInfo);
     }
 
-    private void CreateCondition(ClickEvent evt)
+    private void TestConditionManager(ClickEvent evt)
     {
-        Tuple<System.Object, MethodInfo> values = PreProcess();
-        Condition condition;
-
-        if (selectedArgument is ObjectField)
-        {
-            // Evaluate param2 as an argument for the function
-            condition = new(values.Item1, values.Item2, (ConditionComparator)comparatorField.value, GetElementValue(selectedArgument), ORField.value, true);
-        }
-        else
-        {
-            // Evaluate (Instance.MethodInfo() lt/gt/eq Param2)
-            condition = new(values.Item1, values.Item2, (ConditionComparator)comparatorField.value, GetElementValue(selectedArgument), ORField.value, false);
-        }
-
-        //Debug.Log("Created Condition: " + condition);
-        // Add the new Condition to the list
-        if (ConditionManager != null)
-        {
-            SerializedProperty Conditions = ConditionManager.FindPropertyRelative("Conditions");
-            Conditions.InsertArrayElementAtIndex(Conditions.arraySize);
-            Conditions.GetArrayElementAtIndex(Conditions.arraySize - 1).boxedValue = condition;
-            ConditionManager.serializedObject.ApplyModifiedProperties();
-        }
-    }
-
-    private void EvaluateCondition(ClickEvent evt)
-    {
-        /*
-        if (selectedMethod != null)
-        {
-            var val = PreProcess();
-
-            if (selectedArgument is ObjectField objectField)
-            {
-                // Evaluate param2 as an argument for the function
-                Debug.Log(Condition.EvaluateParam2(val.Item1, val.Item2, (ConditionComparator)comparatorField.value, objectField.value));
-            }
-            else
-            {
-                // Evaluate (Instance.MethodInfo() lt/gt/eq Param2)
-                Debug.Log(Condition.Evaluate(val.Item1, val.Item2, (ConditionComparator)comparatorField.value, GetElementValue(selectedArgument)));
-            }
-
-        }
-        */
 
         if (ConditionManager != null)
         {
-            ((ConditionManager) (ConditionManager.boxedValue)).EvaluateConditions(true);
+            ConditionManager conditionManager = (ConditionManager)(ConditionManager.boxedValue);
+            conditionManager.OnValidate();
+            conditionManager.EvaluateConditions(true);
         }
 
     }
@@ -382,6 +493,8 @@ public class ConditionManagerWindow : EditorWindow
             return toggle.value;
         else if (elm is EnumField enumField)
             return enumField.value;
+        else if (elm is EnumFlagsField enumFlagsField)
+            return enumFlagsField.value;
 
         return null;
     }
@@ -409,6 +522,8 @@ public class ConditionManagerWindow : EditorWindow
         createConditionBtn.style.display = DisplayStyle.Flex;
         ORField.style.display = DisplayStyle.Flex;
         enumCompare.style.display = DisplayStyle.Flex;
+        enumFlagsCompare.style.display = DisplayStyle.Flex;
+        paramContainer.style.display = DisplayStyle.Flex;
     }
 
     private void HideAllOptions()
@@ -426,7 +541,8 @@ public class ConditionManagerWindow : EditorWindow
         createConditionBtn.style.display = DisplayStyle.None;
         ORField.style.display = DisplayStyle.None;
         enumCompare.style.display = DisplayStyle.None;
+        enumFlagsCompare.style.display = DisplayStyle.None;
+        paramContainer.style.display = DisplayStyle.None;
     }
-
     #endregion
 }
