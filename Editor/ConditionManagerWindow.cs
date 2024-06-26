@@ -39,6 +39,8 @@ public class ConditionManagerWindow : EditorWindow
     public static void ShowWindow(SerializedProperty conditionmanager)
     {
         ConditionManager = conditionmanager;
+        // Check validity of conditionManager cause why not
+        ((ConditionManager)ConditionManager.boxedValue).OnValidate();
         ConditionManagerWindow wnd = GetWindow<ConditionManagerWindow>();
         wnd.titleContent = new GUIContent($"{ConditionManager.serializedObject.targetObject} - Condition Manager");
     }
@@ -104,7 +106,7 @@ public class ConditionManagerWindow : EditorWindow
 
 
         compareBtn = root.Q<Button>("evaluateCondition");
-        compareBtn.RegisterCallback<ClickEvent>(EvaluateCondition);
+        compareBtn.RegisterCallback<ClickEvent>(TestConditionManager);
 
         createConditionBtn = root.Q<Button>("createCondition");
         createConditionBtn.RegisterCallback<ClickEvent>(CreateCondition);
@@ -391,13 +393,23 @@ public class ConditionManagerWindow : EditorWindow
 
         //Debug.Log("Created Condition: " + condition);
         // Add the new Condition to the list
-        if (ConditionManager != null)
+        if (condition.IsValid)
         {
-            SerializedProperty Conditions = ConditionManager.FindPropertyRelative("Conditions");
-            Conditions.InsertArrayElementAtIndex(Conditions.arraySize);
-            Conditions.GetArrayElementAtIndex(Conditions.arraySize - 1).boxedValue = condition;
-            ConditionManager.serializedObject.ApplyModifiedProperties();
+            if (ConditionManager != null)
+            {
+                // Extra check on the validity of this Manager. Cause why not
+                ((ConditionManager)ConditionManager.boxedValue).OnValidate();
+                SerializedProperty Conditions = ConditionManager.FindPropertyRelative("Conditions");
+                Conditions.InsertArrayElementAtIndex(Conditions.arraySize);
+                Conditions.GetArrayElementAtIndex(Conditions.arraySize - 1).boxedValue = condition;
+                ConditionManager.serializedObject.ApplyModifiedProperties();
+            }
         }
+        else
+        {
+            Debug.Log("Created Condition was invalid");
+        }
+
     }
 
     #region Utility
@@ -449,30 +461,14 @@ public class ConditionManagerWindow : EditorWindow
         return new(callingObject, methodInfo);
     }
 
-    private void EvaluateCondition(ClickEvent evt)
+    private void TestConditionManager(ClickEvent evt)
     {
-        /*
-        if (selectedMethod != null)
-        {
-            var val = PreProcess();
-
-            if (selectedArgument is ObjectField objectField)
-            {
-                // Evaluate param2 as an argument for the function
-                Debug.Log(Condition.EvaluateParam2(val.Item1, val.Item2, (ConditionComparator)comparatorField.value, objectField.value));
-            }
-            else
-            {
-                // Evaluate (Instance.MethodInfo() lt/gt/eq Param2)
-                Debug.Log(Condition.Evaluate(val.Item1, val.Item2, (ConditionComparator)comparatorField.value, GetElementValue(selectedArgument)));
-            }
-
-        }
-        */
 
         if (ConditionManager != null)
         {
-            ((ConditionManager) (ConditionManager.boxedValue)).EvaluateConditions(true);
+            ConditionManager conditionManager = (ConditionManager)(ConditionManager.boxedValue);
+            conditionManager.OnValidate();
+            conditionManager.EvaluateConditions(true);
         }
 
     }

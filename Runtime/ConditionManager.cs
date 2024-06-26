@@ -105,7 +105,7 @@ namespace EZConditions
         /// Important because of the nonSerializable information in Condition, we should invalidate
         /// the non-serializable field so that they are reconstructed as needed
         /// </summary>
-        private void OnValidate()
+        public void OnValidate()
         {
             List<Condition> ToRemove = new List<Condition>();
             foreach (Condition condition in Conditions)

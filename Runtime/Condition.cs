@@ -36,34 +36,42 @@ namespace EZConditions
             // Creates and caches function if its null.
             get
             {
-                // Try catch will be nice
                 if (function == null)
                 {
-                    if (MethodName == null)
-                        ConditionUtility.LogError("Condition: MethodName was null");
+                    // Try and get Cached Method
+                    function = ConditionUtility.ConditionCache.Get(obj.TypeName + MethodName);
 
-                    // Static support
-                    if (obj.GetObject() is Type tp)
+                    // Recreate the function and add it to the cache if we don't have it in cache
+                    if (function == null)
                     {
-                        function = tp.GetMethod(methodName);
-                    }
-                    else
-                    {
-                        function = Obj.GetType().GetMethod(MethodName);
-                    }
+                        // Static Method support
+                        if (obj.GetObject() is Type tp)
+                        {
+                            function = tp.GetMethod(methodName);
+                        }
+                        else
+                        {
+                            function = Obj.GetType().GetMethod(MethodName);
+                        }
 
-                }
-                if (function == null)
-                {
-                    ConditionUtility.LogError("Condition: Critical Error. Was unable to fetch condition function.");
+                        // Error. Condition is invalid
+                        if (function == null)
+                        {
+                            ConditionUtility.LogError("Condition: Critical Error. Was unable to fetch condition function.");
 #if UNITY_EDITOR
-                    Debug.LogError("Creating Conditions with the \"+\" button is unsupported. If that's not your issue, Let EZ Know");
+                            Debug.LogError("Creating Conditions with the \"+\" button is unsupported. If that's not your issue, Let EZ Know");
 #endif
+                            throw new ArgumentNullException($"Condition Method: {MethodName} Could not be constructed");
+                        }
+
+                        // Add this to the Cache of methods 
+                        ConditionUtility.ConditionCache.Put(obj.TypeName + MethodName, function);
+                    }
                 }
 
                 return function;
             }
-            private set { function = value; }
+            private set { function = value; ConditionUtility.ConditionCache.Put(obj.TypeName + MethodName, function); }
         }
         public System.Object ComparedValue { get => comparedValue.GetObject(); private set => comparedValue = new SerializableObjectWrapper(value); }
 
@@ -74,7 +82,7 @@ namespace EZConditions
         {
             get
             {
-                if (Function != null)
+                if (!string.IsNullOrEmpty(MethodName) && Function != null)
                 {
                     if (Obj != null || Function.IsStatic)
                     {
