@@ -175,10 +175,14 @@ public class ConditionManagerWindow : EditorWindow
             members = mono.GetClass().GetMembers(BindingFlags.Public | BindingFlags.Static)
                 .Where(member => member.GetCustomAttribute<ConditionAttribute>() != null).ToList();
         }
+        else
+        {
+            // Get only public methods and properties with ConditionAttribute
+            members = (component.GetType().GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static)
+                .Where(member => member.GetCustomAttribute<ConditionAttribute>() != null)).ToList();
+        }
 
-        // Get only public methods and properties with ConditionAttribute
-        members.AddRange(component.GetType().GetMembers(BindingFlags.Instance | BindingFlags.Public)
-            .Where(member => member.GetCustomAttribute<ConditionAttribute>() != null));
+
 
 
 
