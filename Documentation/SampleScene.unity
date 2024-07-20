@@ -135,8 +135,6 @@ GameObject:
   - component: {fileID: 142423400}
   - component: {fileID: 142423399}
   - component: {fileID: 142423403}
-  - component: {fileID: 142423404}
-  - component: {fileID: 142423405}
   m_Layer: 0
   m_Name: ConditionTester
   m_TagString: Untagged
@@ -241,46 +239,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 142423398}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fade6a22e29d53247a3f98eeff66a025, type: 3}
+  m_Script: {fileID: 11500000, guid: 02cd4132b7bb239448257774c9da23d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Name>k__BackingField: Character
-  isDead: 1
-  DeathXP: 50
-  Collider: {fileID: 142423399}
---- !u!114 &142423404
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 142423398}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9fb21b428cc6c414c906476337bfeda7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inDialogue: 1
-  timesDefeated: 110
-  inventoryWeight: 337
-  maxWeight: 100
-  enumTest: 1
-  enumTest2: 0
   conditionManager:
-    Conditions: []
---- !u!114 &142423405
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 142423398}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0080e6fec2a51344b8d8e64cb0f93a47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Conditions: []
+    Conditions:
+    - obj:
+        TypeName: 
+        JsonData: 
+        UnityObject: {fileID: 189146401}
+      comparator: 0
+      or: 0
+      methodName: get_Name
+      parameters: []
+      comparedValue:
+        TypeName: System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+        JsonData: John Doe
+        UnityObject: {fileID: 0}
 --- !u!1 &189146399
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,9 +268,8 @@ GameObject:
   - component: {fileID: 189146404}
   - component: {fileID: 189146403}
   - component: {fileID: 189146402}
-  - component: {fileID: 189146401}
-  - component: {fileID: 189146400}
   - component: {fileID: 189146406}
+  - component: {fileID: 189146401}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -303,19 +277,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &189146400
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 189146399}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0080e6fec2a51344b8d8e64cb0f93a47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Conditions: []
 --- !u!114 &189146401
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -328,7 +289,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fade6a22e29d53247a3f98eeff66a025, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Name>k__BackingField: steve
+  <Name>k__BackingField: Steve
   isDead: 1
   DeathXP: 50
   Collider: {fileID: 189146402}
@@ -643,7 +604,6 @@ GameObject:
   - component: {fileID: 1091432845}
   - component: {fileID: 1091432844}
   - component: {fileID: 1091432843}
-  - component: {fileID: 1091432847}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -738,61 +698,12 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1091432847
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1091432842}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c268996fe7fa704fb95527d39ab3ab0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ConditionManager:
-    Conditions:
-    - obj: {fileID: 189146401}
-      comparator: 0
-      or: 1
-      methodName: HasCollider
-      parameters:
-      - TypeName: 
-        JsonData: 
-        UnityObject: {fileID: 189146402}
-      comparedValue:
-        TypeName: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-        JsonData: True
-        UnityObject: {fileID: 0}
-    - obj: {fileID: 142423404}
-      comparator: 0
-      or: 0
-      methodName: InDialogue
-      parameters: []
-      comparedValue:
-        TypeName: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-        JsonData: False
-        UnityObject: {fileID: 0}
-    - obj: {fileID: 189146401}
-      comparator: 2
-      or: 0
-      methodName: GetDeathXP
-      parameters: []
-      comparedValue:
-        TypeName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-        JsonData: 10
-        UnityObject: {fileID: 0}
-  <MoveOption>k__BackingField: 0
-  <WalkOption>k__BackingField: 0
-  LayerMask:
-    serializedVersion: 2
-    m_Bits: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 963194228}
   - {fileID: 705507995}
-  - {fileID: 142423402}
   - {fileID: 189146405}
   - {fileID: 1091432846}
+  - {fileID: 142423402}
