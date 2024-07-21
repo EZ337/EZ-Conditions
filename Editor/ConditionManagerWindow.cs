@@ -103,13 +103,6 @@ namespace EZConditions
                 this.Close();
             }
 
-
-            if (AssetDatabase.Contains(ConditionManagerWindow.ConditionManager.serializedObject.targetObject))
-            {
-                param1Field.allowSceneObjects = false;
-                param2Field.allowSceneObjects = false;
-            }
-
             compareBtn = root.Q<Button>("evaluateCondition");
             compareBtn.RegisterCallback<ClickEvent>(TestConditionManager);
 
@@ -424,7 +417,7 @@ namespace EZConditions
             }
             else
             {
-                Debug.Log("Created Condition was invalid");
+                Debug.LogWarning("Created Condition was invalid");
             }
 
         }
@@ -556,5 +549,12 @@ namespace EZConditions
             paramContainer.style.display = DisplayStyle.None;
         }
         #endregion
+
+        private void OnSelectionChange()
+        {
+            // For now just close the window when we change our selection
+           Close();
+        }
+
     }
 }
