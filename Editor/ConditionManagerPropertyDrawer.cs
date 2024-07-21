@@ -46,7 +46,7 @@ namespace EZConditions
             {
                 // Add the heoght of the conditions property
                 height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("Conditions"), true);
-                height += EditorGUIUtility.singleLineHeight * 2; // Space for the button
+                height += EditorGUIUtility.singleLineHeight * 3; // Space for the 2 buttons and the defaultReturn
             }
 
             return height;
