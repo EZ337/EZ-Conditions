@@ -243,19 +243,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   conditionManager:
-    Conditions:
-    - obj:
-        TypeName: 
-        JsonData: 
-        UnityObject: {fileID: 189146401}
-      comparator: 0
-      or: 0
-      methodName: get_Name
-      parameters: []
-      comparedValue:
-        TypeName: System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-        JsonData: John Doe
-        UnityObject: {fileID: 0}
+    DefaultReturn: 0
+    Conditions: []
 --- !u!1 &189146399
 GameObject:
   m_ObjectHideFlags: 0
