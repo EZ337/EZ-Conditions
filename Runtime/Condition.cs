@@ -87,7 +87,7 @@ namespace EZConditions
                         int i = 0;
                         foreach (ParameterInfo paramInfo in Function.GetParameters())
                         {
-                            if (paramInfo.ParameterType != Parameters[i++].GetType())
+                            if (paramInfo.ParameterType.AssemblyQualifiedName != Parameters[i++].TypeName)
                                 return false;
                         }
 
