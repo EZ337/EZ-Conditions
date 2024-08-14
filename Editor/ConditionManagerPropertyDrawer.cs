@@ -10,7 +10,6 @@ namespace EZConditions
         public SerializedProperty DefaultReturn;
 
         private string[] defaultReturn = { "False", "True" };
-        private GUIContent[] toto = { new("False"), new("True") };
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             Conditions = property.FindPropertyRelative("Conditions");
