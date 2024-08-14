@@ -7,6 +7,7 @@ namespace EZConditions
     public class ConditionManager
     {
         [Tooltip("The default value returned when there are no Conditions in the List")]
+        [HideInInspector]
         public bool DefaultReturn = true;
 
         [Tooltip("List of conditions. If empty, returns DefaultReturn")]

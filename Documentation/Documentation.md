@@ -1,19 +1,23 @@
-- [Important](#important)
-- [Condition Attribute](#condition-attribute)
-- [Creating A Condition](#creating-a-condition)
-- [Visual Tutorial (EZSampleScript1 and 2 included in package)](#visual-tutorial-ezsamplescript1-and-2-included-in-package)
-    - [Property Condition](#property-condition)
-- [Limitations](#limitations)
-  - [Example Operations. "+" Means OR "\*" means "AND"](#example-operations--means-or--means-and)
-  - [Concrete Examples. A = TRUE, B = FALSE, C = FALSE, D = TRUE, E = FALSE](#concrete-examples-a--true-b--false-c--false-d--true-e--false)
+- [Scripting References](#scripting-references)
+- [How To](#how-to)
+  - [Condition Attribute](#condition-attribute)
+  - [Creating A Condition](#creating-a-condition)
+  - [Visual Tutorial (EZSampleScript1 and 2 included in package)](#visual-tutorial-ezsamplescript1-and-2-included-in-package)
+      - [Property Condition](#property-condition)
+  - [Limitations](#limitations)
+  - [Examples](#examples)
+    - [Example Operations. "+" Means OR "\*" means "AND"](#example-operations--means-or--means-and)
+    - [Concrete Examples. A = TRUE, B = FALSE, C = FALSE, D = TRUE, E = FALSE](#concrete-examples-a--true-b--false-c--false-d--true-e--false)
 
+# Scripting References
+- [ConditionUtility.cs](./ConditionUtility.cs.md)
 
-## Important
-Conditions are evaluated with `OR` Superiority. Meaning if I have a condition `A OR B AND C`, the condition is evaluated as `(A OR B) AND C`. In otherwords, the order of operation is such that immediately an OR is encountered, it grabs the next immediate Condition to evaluate until it hits an AND. An OR Condition with nothing after it is treated as an AND. Meaning if it's False, the total operation is false. See Examples below. **<u>The order in which you have your conditions MATTER</u>** One false means the whole ConditionManager is false. `A OR B AND C` is **VERY** different from `B AND A OR C` or any variation.
+# How To
+Conditions are evaluated with `OR` Superiority. Meaning if I have a condition `A OR B AND C`, the condition is evaluated as `(A OR B) AND C`. In otherwords, the order of operation is such that immediately an OR is encountered, it grabs the next immediate Condition to evaluate until it hits an AND. An OR Condition with nothing after it is treated as an AND. Meaning if it's False, the total operation is false. See Examples below. **<u>The order in which you have your conditions MATTER.</u>** One false means the whole ConditionManager is false. `A OR B AND C` is **VERY** different from `B AND A OR C` or any variation.
 
 ***
 
-There are 2 main steps to creating and using a condition. The first part is setting up the condition itself. Regarding this package, this is the only scripting required. It is simply marking a method or property with the **`[Condition]` attribute**. The second part is attaching conditions to a script using `ConditionManager` ~~or to a gameObject using `ConditionManagerComponent`~~. The term "condition function" will refer to a function marked with the condition attribute. **NOTE: <u>An empty ConditionManager evaluates to true</u>**
+There are 2 main steps to creating and using a condition. The first part is setting up the condition itself. Regarding this package, this is the only scripting required. It is simply marking a method or property with the **`[Condition]` attribute**. The second part is attaching conditions to a script using `ConditionManager` ~~or to a gameObject using `ConditionManagerComponent`~~. The term "condition function" will refer to a function marked with the condition attribute. **NOTE: <u>An empty ConditionManager evaluates to true (as of version 1.0.0-beta.4, You can specify the default return)</u>**
 
 There are samples in the package for your reference as of v1.0.0-beta2.
 
@@ -71,7 +75,7 @@ The examples below are all from the script `EZSampleScript1` which is located in
 - Once a condition is created, it is read only. You have to remove it from the condition manager and create a new one if you want it to be different. 
 - Because of the above, it is ill-advised to create conditions outside of the condition manager. Although you’re not restricted from doing so. Make sure to validate with `Condition.IsValid` property to check the validity of whatever condition you make before utilising it.
 
-***
+## Examples
 
 ### Example Operations. "+" Means OR "*" means "AND"
 - A = A OR = A AND
