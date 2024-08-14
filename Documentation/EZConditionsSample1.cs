@@ -4,7 +4,7 @@ namespace EZConditions
 {
     public class EZConditionsSample1 : MonoBehaviour
     {
-        [field : SerializeField]
+        [field: SerializeField]
         [Condition]
         public string Name {get; set;}
 

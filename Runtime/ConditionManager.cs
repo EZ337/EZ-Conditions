@@ -6,11 +6,22 @@ namespace EZConditions
     [System.Serializable]
     public class ConditionManager
     {
-        /// <summary>
-        /// List of conditions
-        /// </summary>
+        [Tooltip("The default value returned when there are no Conditions in the List")]
+        [HideInInspector]
+        public bool DefaultReturn = true;
 
+        [Tooltip("List of conditions. If empty, returns DefaultReturn")]
         public List<Condition> Conditions = new List<Condition>();
+
+        /// <summary>
+        /// Create a new ConditionManager
+        /// </summary>
+        /// <param name="defaultReturn">The default return value when there are no conditions in the List. Defaults to true</param>
+        public ConditionManager(bool defaultReturn = true)
+        {
+            this.DefaultReturn = defaultReturn;
+        }
+
 
         /// <summary>
         /// Evaluates the set of conditions belonging to this manager. Pass in true to receive Debug info
@@ -22,6 +33,13 @@ namespace EZConditions
             bool totalLogic = true;
             bool evaluatingOrGroup = false;
             bool orGroupResult = false;
+
+            if (Conditions.Count == 0)
+            {
+                if (debug)
+                    Debug.Log($"ConditionManager has no conditions. DefaultReturn: {DefaultReturn}");
+                return DefaultReturn;
+            }
 
             try
             {

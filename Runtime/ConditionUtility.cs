@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using EZConditions.LRU;
 
 namespace EZConditions
 {
     public static class ConditionUtility
     {
-        public const string VERSION = "1.0.0-beta.3";
+        public const string VERSION = "1.0.0-beta.4";
         private const string LOGBEGIN = "\n---EZConditions---";
         private const string LOGEND = "---END EZConditions---\n";
         /// <summary>
@@ -26,7 +27,7 @@ namespace EZConditions
         /// </summary>
         /// <param name="minInclusive">Minimum number to consider</param>
         /// <param name="maxInclusive">Maximum number to consider</param>
-        /// <returns>Random valuue between min (inclusive) and max (inclusive)</returns>
+        /// <returns>Random value between min (inclusive) and max (inclusive)</returns>
         [Condition]
         public static float GetRandomFloat(float minInclusive, float maxInclusive)
         {
@@ -38,7 +39,7 @@ namespace EZConditions
         /// </summary>
         /// <param name="minInclusive">Minimum number to consider</param>
         /// <param name="maxExclusive">Maximum number to consider</param>
-        /// <returns>Random valuue between min (inclusive) and max (exclusive)</returns>
+        /// <returns>Random value between min (inclusive) and max (exclusive)</returns>
         [Condition]
         public static int GetRandomInt(int minInclusive, int maxExclusive)
         {
@@ -133,81 +134,83 @@ namespace EZConditions
 
     }
 
-
-    public class LRUCache<K, V>
+    namespace LRU
     {
-        private readonly int capacity;
-        private readonly Dictionary<K, LinkedListNode<CacheItem>> cacheMap;
-        private readonly LinkedList<CacheItem> lruList;
+        public class LRUCache<K, V>
+        {
+            private readonly int capacity;
+            private readonly Dictionary<K, LinkedListNode<CacheItem>> cacheMap;
+            private readonly LinkedList<CacheItem> lruList;
 
-        /// <summary>
-        /// Simple class to store the key/value pair so I can remove it from the dictionary
-        /// </summary>
-        private class CacheItem
-        {
-            public K Key { get; set; }
-            public V Value { get; set; }
-        }
-        /// <summary>
-        /// Creates an LRU with size = capacity
-        /// </summary>
-        /// <param name="capacity">Capacity of the LRU before replacements take place</param>
-        /// <exception cref="ArgumentException"></exception>
-        public LRUCache(int capacity)
-        {
-            if (capacity <= 0) throw new ArgumentException("Capacity must be greater than zero.");
-            this.capacity = capacity;
-            cacheMap = new Dictionary<K, LinkedListNode<CacheItem>>(capacity);
-            lruList = new LinkedList<CacheItem>();
-        }
-
-        /// <summary>
-        /// Gets the value associated with the specified key from the LRU cache.
-        /// Returns null if the key is not found.
-        /// </summary>
-        /// <param name="key">The key to look up.</param>
-        /// <returns>The value associated with the key, or null if not found.</returns>
-        public V Get(K key)
-        {
-            if (cacheMap.TryGetValue(key, out LinkedListNode<CacheItem> node))
+            /// <summary>
+            /// Simple class to store the key/value pair so I can remove it from the dictionary
+            /// </summary>
+            private class CacheItem
             {
-                lruList.Remove(node);
-                lruList.AddFirst(node);
-                return node.Value.Value;
+                public K Key { get; set; }
+                public V Value { get; set; }
             }
-            // Return default value (null for reference types, or default value for value types)
-            return default; 
-        }
-
-
-        public void Put(K key, V value)
-        {
-            if (cacheMap.TryGetValue(key, out var node))
+            /// <summary>
+            /// Creates an LRU with size = capacity
+            /// </summary>
+            /// <param name="capacity">Capacity of the LRU before replacements take place</param>
+            /// <exception cref="ArgumentException"></exception>
+            public LRUCache(int capacity)
             {
-                lruList.Remove(node);
-                node.Value.Value = value;
-                lruList.AddFirst(node);
+                if (capacity <= 0) throw new ArgumentException("Capacity must be greater than zero.");
+                this.capacity = capacity;
+                cacheMap = new Dictionary<K, LinkedListNode<CacheItem>>(capacity);
+                lruList = new LinkedList<CacheItem>();
             }
-            else
+
+            /// <summary>
+            /// Gets the value associated with the specified key from the LRU cache.
+            /// Returns null if the key is not found.
+            /// </summary>
+            /// <param name="key">The key to look up.</param>
+            /// <returns>The value associated with the key, or null if not found.</returns>
+            public V Get(K key)
             {
-                if (cacheMap.Count >= capacity)
+                if (cacheMap.TryGetValue(key, out LinkedListNode<CacheItem> node))
                 {
-                    var lastNode = lruList.Last;
-                    if (lastNode != null)
-                    {
-                        cacheMap.Remove(lastNode.Value.Key);
-                        lruList.RemoveLast();
-                    }
+                    lruList.Remove(node);
+                    lruList.AddFirst(node);
+                    return node.Value.Value;
                 }
-
-                var newItem = new CacheItem { Key = key, Value = value };
-                var newNode = new LinkedListNode<CacheItem>(newItem);
-                lruList.AddFirst(newNode);
-                cacheMap[key] = newNode;
+                // Return default value (null for reference types, or default value for value types)
+                return default;
             }
+
+
+            public void Put(K key, V value)
+            {
+                if (cacheMap.TryGetValue(key, out var node))
+                {
+                    lruList.Remove(node);
+                    node.Value.Value = value;
+                    lruList.AddFirst(node);
+                }
+                else
+                {
+                    if (cacheMap.Count >= capacity)
+                    {
+                        var lastNode = lruList.Last;
+                        if (lastNode != null)
+                        {
+                            cacheMap.Remove(lastNode.Value.Key);
+                            lruList.RemoveLast();
+                        }
+                    }
+
+                    var newItem = new CacheItem { Key = key, Value = value };
+                    var newNode = new LinkedListNode<CacheItem>(newItem);
+                    lruList.AddFirst(newNode);
+                    cacheMap[key] = newNode;
+                }
+            }
+
+
         }
-
-
     }
 
 }

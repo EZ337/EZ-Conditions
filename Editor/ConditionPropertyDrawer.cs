@@ -43,9 +43,9 @@ namespace EZConditions
                 if (property.boxedValue is Condition condition)
                 {
                     // Display warning if invalid
-                    if (condition.Function.ReturnType == typeof(void))
+                    if (!condition.IsValid)
                     {
-                        EditorGUI.HelpBox(position, $"{condition} always returns false", MessageType.Warning);
+                        EditorGUI.HelpBox(position, $"{condition} is invalid", MessageType.Warning);
                     }
                     else
                     {
