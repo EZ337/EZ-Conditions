@@ -25,8 +25,10 @@ namespace EZConditions
         public ConditionComparator Comparator { get => comparator; private set => comparator = value; }
         public bool OR { get => or; private set => or = value; } // Whether this condition treated as AND or OR
 
-        // MethodInfo Serialization since Unity does not serialize by default.
-        // Reflections can be a performance concern so worth coming back to
+        /// <summary>
+        /// MethodInfo Serialization since Unity does not serialize by default.
+        /// Reflections can be a performance concern so worth coming back to
+        /// </summary>
         // TODO: Update to a custom [better] serialization approach
         public string MethodName { get => methodName; private set => methodName = value; }
         public MethodInfo Function
@@ -128,7 +130,7 @@ namespace EZConditions
             this.OR = OR;
         }
 
-        public bool EvaluateCondition()
+        public bool Evaluate()
         {
             return Evaluate(Obj, Function, Parameters, Comparator, ComparedValue);
         }
@@ -190,7 +192,7 @@ namespace EZConditions
         /// <param name="condition">Condition to evaluate</param>
         public static implicit operator bool(Condition condition)
         {
-            return condition.EvaluateCondition();
+            return condition.Evaluate();
         }
 
         public static string ComparatorString(ConditionComparator comparator)

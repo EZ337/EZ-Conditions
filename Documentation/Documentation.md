@@ -2,24 +2,25 @@
 - [How To](#how-to)
   - [Condition Attribute](#condition-attribute)
   - [Creating A Condition](#creating-a-condition)
-  - [Visual Tutorial (EZSampleScript1 and 2 included in package)](#visual-tutorial-ezsamplescript1-and-2-included-in-package)
+  - [Visual Tutorial](#visual-tutorial)
       - [Property Condition](#property-condition)
   - [Limitations](#limitations)
   - [Examples](#examples)
-    - [Example Operations. "+" Means OR "\*" means "AND"](#example-operations--means-or--means-and)
-    - [Concrete Examples. A = TRUE, B = FALSE, C = FALSE, D = TRUE, E = FALSE](#concrete-examples-a--true-b--false-c--false-d--true-e--false)
+    - [Example Operations](#example-operations)
+    - [Concrete Examples](#concrete-examples)
 
 # Scripting References
 - [ConditionUtility.cs](./ConditionUtility.cs.md)
+- [ConditionManager.cs](./ConditionManager.cs.md)
+- [Condition.cs](./Condition.cs.md)
+- [SerializableObjectWrapper.cs](./SerializableObjectWrapper.cs.md)
 
 # How To
 Conditions are evaluated with `OR` Superiority. Meaning if I have a condition `A OR B AND C`, the condition is evaluated as `(A OR B) AND C`. In otherwords, the order of operation is such that immediately an OR is encountered, it grabs the next immediate Condition to evaluate until it hits an AND. An OR Condition with nothing after it is treated as an AND. Meaning if it's False, the total operation is false. See Examples below. **<u>The order in which you have your conditions MATTER.</u>** One false means the whole ConditionManager is false. `A OR B AND C` is **VERY** different from `B AND A OR C` or any variation.
 
 ***
 
-There are 2 main steps to creating and using a condition. The first part is setting up the condition itself. Regarding this package, this is the only scripting required. It is simply marking a method or property with the **`[Condition]` attribute**. The second part is attaching conditions to a script using `ConditionManager` ~~or to a gameObject using `ConditionManagerComponent`~~. The term "condition function" will refer to a function marked with the condition attribute. **NOTE: <u>An empty ConditionManager evaluates to true (as of version 1.0.0-beta.4, You can specify the default return)</u>**
-
-There are samples in the package for your reference as of v1.0.0-beta2.
+There are 2 main steps to creating and using a condition. The first part is setting up the condition itself. Regarding this package, this is the only scripting required. It is simply marking a method or property with the **`[Condition]` attribute**. The second part is attaching conditions to a script using `ConditionManager` ~~or to a gameObject using `ConditionManagerComponent`~~. The term "condition function" will refer to a function marked with the condition attribute. **NOTE: <u>An empty ConditionManager evaluates to the specified default return.</u>**
 
 
 ## Condition Attribute
@@ -28,7 +29,7 @@ Attributes, for reference, are the metadata in square brackets above a class, me
 ## Creating A Condition
 The `[Condition]` Attribute is your first step to creating a condition. As stated above, it is important that the return type of the condition implement the `IComparable` interface provided by C#. Once that is done, the next step is to add a `ConditionManager` field to a given object. Once added, you can create a condition with the `Create Condition` button in the inspector. This will open a window for you to create your condition (As of now, Creating Conditions with the "+" button is unsupported. You can remove functions with the "-" button however). Simply drag a gameObject or script into the object field to begin. If there are any valid condition functions on the game object, they will appear for you to select from. **Note that asset objects <u>should only</u> accept other asset objects.** That's it. it is **HIGHLY** recommended that you test conditions as I put additional checks when you run that function in the editor. Again, **<u>An empty ConditionManager evaluates to true</u>** If the object is a MonoScript, only static members are valid.
 
-## Visual Tutorial (EZSampleScript1 and 2 included in package)
+## Visual Tutorial
 I have created a simple class called `ArbitraryClass` which has a `ConditionManager` field on it just as you would in your own class and attached it to a gameObject. When I refer to ArbitraryClass, substitute with the actual class you are working with.
 ![image](https://github.com/EZ337/EZ-Conditions/assets/88570645/ef1ed9b2-2680-4c28-8f5a-17dca26dd617)
 
@@ -77,13 +78,17 @@ The examples below are all from the script `EZSampleScript1` which is located in
 
 ## Examples
 
-### Example Operations. "+" Means OR "*" means "AND"
+### Example Operations
+"+" Means OR "*" means "AND"
+
 - A = A OR = A AND
 - A*B = A AND B
 - A+B = A OR B
 - A * B + C = A AND (B + C)
 
-### Concrete Examples. A = TRUE, B = FALSE, C = FALSE, D = TRUE, E = FALSE
+### Concrete Examples
+A = TRUE, B = FALSE, C = FALSE, D = TRUE, E = FALSE
+
 - A = TRUE
 - B = FALSE
 - A AND B
