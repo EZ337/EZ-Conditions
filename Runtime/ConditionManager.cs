@@ -145,7 +145,7 @@ namespace EZConditions
                 Debug.LogWarning("Invalid Condition Removed");
             }
         }
-    }
 #endif
+    }
 }
 
